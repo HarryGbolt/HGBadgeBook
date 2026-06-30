@@ -91,11 +91,6 @@
             text-overflow: ellipsis;
             line-height: 1.3;
         }
-        .badge-item .badge-info .category {
-            font-size: 12px;
-            color: #888;
-            margin-top: 2px;
-        }
         .badge-item .badge-status {
             font-size: 12px;
             font-weight: 600;
@@ -322,47 +317,21 @@
             overflow-y: auto;
         }
         .modal-body .stage-selector {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding: 10px 14px;
-            background: #f5f3ff;
-            border-radius: 12px;
-            flex-wrap: wrap;
-        }
-        .modal-body .stage-selector label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #4a2c8a;
-        }
-        .modal-body .stage-selector select {
-            flex: 1;
-            min-width: 80px;
-            padding: 8px 12px;
-            border: 2px solid #4a2c8a;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            background: white;
-            color: #1a1a2e;
-            outline: none;
-            cursor: pointer;
-        }
-        .modal-body .stage-selector select:focus {
-            border-color: #2d1b69;
-            box-shadow: 0 0 0 3px rgba(74, 44, 138, 0.2);
-        }
-        .modal-body .stage-selector .stage-progress {
-            font-size: 13px;
-            color: #4a2c8a;
-            font-weight: 600;
-            margin-left: auto;
+            display: none;
         }
         .modal-body .requirements-title {
             font-size: 17px;
             font-weight: 700;
             color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+        .modal-body .choose-hint {
+            font-size: 14px;
+            color: #4a2c8a;
+            font-weight: 600;
+            background: #f5f3ff;
+            padding: 8px 14px;
+            border-radius: 10px;
             margin-bottom: 12px;
         }
         .modal-body ul {
@@ -589,11 +558,6 @@
         .search-wrap {
             display: none;
         }
-
-        /* Scroll padding for search */
-        .scroll-container {
-            padding-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -628,12 +592,9 @@
                 </div>
             </div>
             <div class="modal-body" id="modalBody">
-                <div class="stage-selector" id="stageSelector" style="display:none;">
-                    <label>Select Stage:</label>
-                    <select id="stageSelect"></select>
-                    <span class="stage-progress" id="stageProgress">0/0</span>
-                </div>
+                <div class="stage-selector" id="stageSelector" style="display:none;"></div>
                 <div class="requirements-title" id="requirementsTitle">Requirements</div>
+                <div class="choose-hint" id="chooseHint" style="display:none;"></div>
                 <ul id="modalRequirements"></ul>
             </div>
             <div class="modal-footer">
@@ -664,7 +625,7 @@
 
     <script>
         // ============================================================
-        // DATA — All Badges (58 total)
+        // DATA — All Badges (58 total) - same as before
         // ============================================================
 
         var BADGES = {
@@ -686,7 +647,8 @@
                     "Solve - Plan a trip to take part in an action sport of your choice. Think about how you'll get there, what costs are involved and what kit you'll need.",
                     "Create - Create a new piece of equipment or accessory that can be used for an action sport of your choice."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "athletics": {
                 name: "Athletics",
@@ -700,7 +662,8 @@
                     "Solve - Create a plan to beat your personal best in an activity, whether it's running, jumping, or throwing, and track how you improve over time.",
                     "Create - Organise and run an athletics event for your District, County or Region. You could organise a venue, plan and lead activities and invite other groups to join."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "camper": {
                 name: "Camper",
@@ -715,7 +678,8 @@
                     "Solve - Plan, budget and execute a camp. You should include activities, a menu and appropriate risk assessments for your Unit.",
                     "Create - Design a local campsite directory, campfire songbook or camp recipe book which could be used by anyone in your group."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "caving": {
                 name: "Caving",
@@ -730,7 +694,8 @@
                     "Solve - Learn how to set up a prussik line for vertical caving and have a go at using it. It's a good idea to have someone experienced and qualified check it's right.",
                     "Create - Create a model cave system showing the reasons that the system formed. It could be based on a cave system that you have visited."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "chef": {
                 name: "Chef",
@@ -744,7 +709,8 @@
                     "Solve - Plan a recipe or menu that you would make in your usual kitchen facilities. Then, try and make that using a different cooking facility (e.g. camping stoves or campfire).",
                     "Create - Create a menu for a specific event. This could be anything from a gala style dinner, or a street food tasting night! Build your budget and shopping list and design the menu."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "climber": {
                 name: "Climber",
@@ -759,7 +725,8 @@
                     "Solve - Look at different safety equipment, discover and discuss how we use it and what each item does. Work out why equipment does not work when it's not used properly.",
                     "Create - Create a guidebook entry for a climb you've done. Consider the information other climbers would need."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "coach": {
                 name: "Coach",
@@ -773,7 +740,8 @@
                     "Solve - Come up with a creative way to explain a tricky concept, like using props or games to make it easier to understand. Test them out on a group.",
                     "Create - Design a session plan or tip sheet describing how you would teach or instruct a specific skill or activity. Test out your plan to see if it helps others learn."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "communication": {
                 name: "Communication",
@@ -787,7 +755,8 @@
                     "Solve - Research the issues around social media and digital communication. Think about the pros and cons of different platforms.",
                     "Create - Create a method of communicating. Think big – this could be from building a machine to help communicate, or designing a method of communication to help in one of your activities."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "content-creation": {
                 name: "Content Creation",
@@ -801,7 +770,8 @@
                     "Solve - Investigate how to make digital content inclusive and accessible, then teach others what you've learned.",
                     "Create - Develop a digital storytelling project that includes diverse voices and perspectives from across Scouting."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "creative-arts": {
                 name: "Creative Arts",
@@ -815,7 +785,8 @@
                     "Solve - Create a piece of art using a non-traditional medium or an innovative way of working.",
                     "Create - Explore an avenue or medium of your choice and create a piece of work that reflects you as a person."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "democracy": {
                 name: "Democracy",
@@ -829,7 +800,8 @@
                     "Solve - Develop a way to improve how young people's voices are heard on issues that affect them.",
                     "Create - Design a simple way to help others understand democracy. This could include how people can take part and why participation matters."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "employability-skills": {
                 name: "Employability Skills",
@@ -843,7 +815,8 @@
                     "Solve - Set up some scenarios or simulations of conflicts you may face and implement some conflict resolution skills.",
                     "Create - Create your CV through a medium not usually seen in job applications. This could be a fun video, a presentation, or a song."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "exploration": {
                 name: "Exploration",
@@ -857,7 +830,8 @@
                     "Solve - Design a detailed plan for an expedition to a remote or hard-to-reach location. Include transport, safety, equipment, budgeting, and team roles.",
                     "Create - While out exploring an area, gather meaningful items, images, or sounds. Use them to produce something that communicates your experience."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "fundraising": {
                 name: "Fundraising",
@@ -871,7 +845,8 @@
                     "Solve - Consider the issues faced by Charities. Would a global charity have the same problems and dilemmas as a local one?",
                     "Create - Make and sell simple handmade items like bracelets, cards, or baked goods, with proceeds going to charity."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "global-issues": {
                 name: "Global Issues",
@@ -885,7 +860,8 @@
                     "Solve - Design and run a community workshop that teaches a practical skill linked to solving a global issue.",
                     "Create - Develop a digital resource like a podcast episode, infographic, or short video about a global issue."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "hill-walker": {
                 name: "Hill Walker",
@@ -900,7 +876,8 @@
                     "Solve - Create and act out realistic emergency scenarios in a hill environment, using appropriate equipment and techniques.",
                     "Create - Create a detailed walk plan and terrain model for a challenging hill walk, using either digital or physical materials."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "hobbies": {
                 name: "Hobbies",
@@ -914,7 +891,8 @@
                     "Solve - Set yourself a goal within your hobby that requires persistence and problem-solving.",
                     "Create - Team up with others to create something that blends your hobbies together."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "leadership": {
                 name: "Leadership",
@@ -928,7 +906,8 @@
                     "Solve - Visit an escape room, and assign different members of the team different leadership roles for different parts of the activity.",
                     "Create - Design a leadership workshop on how to be an effective leader."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "life-skills": {
                 name: "Life Skills",
@@ -942,7 +921,8 @@
                     "Solve - Plan how to get somewhere using only public transport. What are your different options, how much will it cost and how long will the journey take?",
                     "Create - Design a personal budget for a month, including income, savings, and essential expenses."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "money-skills": {
                 name: "Money Skills",
@@ -956,7 +936,8 @@
                     "Solve - Take on a challenge that'll improve your money skills and help you plan for the future.",
                     "Create - Get creative and make something that helps others learn about money in a fun way."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "nature": {
                 name: "Nature",
@@ -970,7 +951,8 @@
                     "Solve - Come up with an idea to mitigate human impact on the environment and enable humans and nature to coexist more effectively.",
                     "Create - Design and assemble multiple wildlife structures that work together to improve the biodiversity of a chosen outdoor space."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "performing-arts": {
                 name: "Performing Arts",
@@ -984,7 +966,8 @@
                     "Solve - Research, design and create a prop/props for a performance of a well-known play using only limited materials.",
                     "Create - Write, rehearse, create props for and perform a short play with your Unit."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "personal-safety": {
                 name: "Personal Safety",
@@ -998,7 +981,8 @@
                     "Solve - Learn and practise decision-making tools like exit plans, refusal skills, and knowing when to ask for help.",
                     "Create - Design a toolkit to help other young people manage risk and stay safe in real-life and online situations."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "pioneering": {
                 name: "Pioneering",
@@ -1013,7 +997,8 @@
                     "Solve - Use rubber bands and lolly sticks to create a bridge or a similar project. How much weight can it hold? How could you make it stronger?",
                     "Create - Design a useful pioneered structure and build it in real life. Include drawings, a scale model, and a guide on how to create it."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "problem-solver": {
                 name: "Problem Solver",
@@ -1027,7 +1012,8 @@
                     "Solve - Participate in a structured problem-solving activity such as a mock trial, ethical debate, or engineering design challenge.",
                     "Create - Invent a problem-solving activity for others to complete - this could be a logic puzzle, roleplay scenario, or digital challenge."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "stem": {
                 name: "S.T.E.M",
@@ -1041,7 +1027,8 @@
                     "Solve - Work out how much energy a campsite would need for one night and plan how to supply it.",
                     "Create - Build a camp gadget that is powered by renewable energy."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "space": {
                 name: "Space",
@@ -1055,7 +1042,8 @@
                     "Solve - Find out about satellites and space rovers, you could practice controlling something from a distance and learn why this is useful.",
                     "Create - Using a medium of your choice showcase something about space that interests you."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "sports-and-fitness": {
                 name: "Sports and Fitness",
@@ -1069,7 +1057,8 @@
                     "Solve - Choose a sport that interests you and find out if the equipment can be made either more environmentally friendly, or more accessible.",
                     "Create - Come up with a new sport, design what it looks like, how you play, and teach another group/section it."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "survival-skills": {
                 name: "Survival Skills",
@@ -1083,7 +1072,8 @@
                     "Solve - Act out a realistic survival situation, such as getting lost while hiking or being stranded after a storm.",
                     "Create - Research and build a survival kit tailored to a particular environment or emergency."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "teamwork": {
                 name: "Teamwork",
@@ -1097,7 +1087,8 @@
                     "Solve - Run three different team building activities. After running them, discuss any challenges you had with your group.",
                     "Create - Produce a team-led presentation or demonstration, that teaches others a skill activity or idea."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "try-new-things": {
                 name: "Try New Things",
@@ -1111,7 +1102,8 @@
                     "Solve - Design a relay or challenge where each stage requires the group to adapt to a new rule, tool, or environment.",
                     "Create - Develop a resource, event, or story that inspires others to embrace new experiences and thrive in uncertainty."
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
             "water-activities": {
                 name: "Water Activities",
@@ -1126,11 +1118,12 @@
                     "Solve - Think about what could happen if things go wrong. Practice some rescue techniques and find out how to keep each other safe.",
                     "Create - Design a craft or equipment you might use in water activities. You could even build your craft and try it out on some water!"
                 ],
-                choose: 3
+                choose: 3,
+                totalOptions: 5
             },
 
             // =========================================================
-            // STAGED BADGES (15)
+            // STAGED BADGES (15) — abbreviated for space
             // =========================================================
 
             "staged-air-activities": {
@@ -1976,7 +1969,9 @@
             current: null,
             currentStage: "1",
             favourites: [],
-            currentPage: "home"
+            currentPage: "home",
+            // Navigation history for back button support
+            navHistory: []
         };
 
         function load() {
@@ -2165,9 +2160,7 @@
                     html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
                     html += '<div class="badge-info">';
                     html += '<div class="name">' + b.name + '</div>';
-                    if (state.currentPage === 'home') {
-                        html += '<div class="category">' + b.categoryLabel + '</div>';
-                    }
+                    // No category label on individual badges - just the section header
                     html += '</div>';
                     html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                     html += '</div>';
@@ -2200,7 +2193,6 @@
                 html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
                 html += '<div class="badge-info">';
                 html += '<div class="name">' + b.name + '</div>';
-                html += '<div class="category">' + b.categoryLabel + '</div>';
                 html += '</div>';
                 html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                 html += '</div>';
@@ -2231,7 +2223,6 @@
             if (page === 'favourites') {
                 document.getElementById('searchBox').value = '';
                 state.search = '';
-                // Hide search on favourites
                 document.querySelector('.nav-search').style.display = 'none';
             } else {
                 document.querySelector('.nav-search').style.display = 'flex';
@@ -2248,8 +2239,11 @@
             var b = BADGES[id];
             if (!b) return;
             state.current = id;
+            state.modalView = 'detail';
 
             if (b.isStaged && b.stages) {
+                // Push to history for back navigation
+                state.navHistory.push('home');
                 showStageList(id);
                 return;
             }
@@ -2265,10 +2259,19 @@
             favBtn.textContent = fav ? "★" : "☆";
             favBtn.className = "modal-fav-btn" + (fav ? " active" : "");
 
-            var stageSelector = document.getElementById("stageSelector");
-            var requirementsTitle = document.getElementById("requirementsTitle");
-            stageSelector.style.display = "none";
-            requirementsTitle.textContent = "Requirements";
+            // Hide stage selector
+            document.getElementById("stageSelector").style.display = "none";
+
+            // Show "Choose 3 of 5" hint for activity badges with choose property
+            var chooseHint = document.getElementById("chooseHint");
+            if (b.choose && b.totalOptions) {
+                chooseHint.style.display = "block";
+                chooseHint.textContent = "Choose " + b.choose + " of " + b.totalOptions + " activities below";
+            } else {
+                chooseHint.style.display = "none";
+            }
+
+            document.getElementById("requirementsTitle").textContent = "Requirements";
 
             var list = document.getElementById("modalRequirements");
             var html = "";
@@ -2298,6 +2301,7 @@
             var b = BADGES[id];
             if (!b || !b.isStaged) return;
 
+            state.modalView = 'stageList';
             var stageKeys = b.stageList || Object.keys(b.stages);
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
@@ -2307,6 +2311,7 @@
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
             document.getElementById("stageSelector").style.display = "none";
+            document.getElementById("chooseHint").style.display = "none";
             document.getElementById("requirementsTitle").textContent = "Select a Stage";
 
             var list = document.getElementById("modalRequirements");
@@ -2352,6 +2357,7 @@
             if (!b || !b.isStaged) return;
             state.current = id;
             state.currentStage = stageKey;
+            state.modalView = 'stageDetail';
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
             document.getElementById("modalTitle").textContent = b.name + " - Stage " + stageKey;
@@ -2359,47 +2365,12 @@
                 top: "Top Award" };
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
-            var stageSelector = document.getElementById("stageSelector");
-            stageSelector.style.display = "flex";
+            // Hide stage selector dropdown (it's now hidden permanently)
+            document.getElementById("stageSelector").style.display = "none";
+            document.getElementById("chooseHint").style.display = "none";
             document.getElementById("requirementsTitle").textContent = "Stage Requirements";
 
-            var select = document.getElementById("stageSelect");
-            var stageKeys = b.stageList || Object.keys(b.stages);
-            select.innerHTML = "";
-            for (var sk = 0; sk < stageKeys.length; sk++) {
-                var key = stageKeys[sk];
-                var option = document.createElement("option");
-                option.value = key;
-                option.textContent = "Stage " + key;
-                if (key === stageKey) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            }
-
-            renderStageRequirements(id, stageKey);
-
-            var sp = getStageProgress(id, stageKey);
-            document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
-            document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
-
-            select.onchange = function() {
-                state.currentStage = this.value;
-                renderStageRequirements(id, state.currentStage);
-                var sp2 = getStageProgress(id, state.currentStage);
-                document.getElementById("stageProgress").textContent = sp2.done + "/" + sp2.total;
-                document.getElementById("modalCount").textContent = sp2.done + " / " + sp2.total + " complete";
-                save();
-            };
-
-            document.getElementById("modalOverlay").className = "modal-overlay show";
-            document.body.style.overflow = "hidden";
-        }
-
-        function renderStageRequirements(id, stageKey) {
-            var b = BADGES[id];
-            if (!b || !b.isStaged) return;
-
+            // Render requirements for this stage
             var reqs = b.stages[stageKey];
             var list = document.getElementById("modalRequirements");
             var html = "";
@@ -2415,14 +2386,51 @@
             list.innerHTML = html;
 
             var sp = getStageProgress(id, stageKey);
-            document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
+            document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
+
+            document.getElementById("modalOverlay").className = "modal-overlay show";
+            document.body.style.overflow = "hidden";
         }
 
         function closeModal() {
+            // Check if we're in a stage detail view - go back to stage list instead of closing
+            if (state.modalView === 'stageDetail' && state.current) {
+                // Go back to stage list
+                showStageList(state.current);
+                return;
+            }
+
+            // Otherwise close the modal
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
             state.current = null;
+            state.modalView = null;
         }
+
+        // Handle Android back button / swipe
+        function handleBack() {
+            // If modal is open
+            if (document.getElementById("modalOverlay").className === "modal-overlay show") {
+                // If in stage detail, go back to stage list
+                if (state.modalView === 'stageDetail' && state.current) {
+                    showStageList(state.current);
+                    return true;
+                }
+                // If in stage list or detail view, close modal
+                if (state.modalView === 'stageList' || state.modalView === 'stageDetail') {
+                    closeModal();
+                    return true;
+                }
+                // Otherwise close modal
+                closeModal();
+                return true;
+            }
+            return false;
+        }
+
+        // ============================================================
+        // TOGGLE FUNCTIONS
+        // ============================================================
 
         function toggleReq(id, index) {
             var key = id + "-" + index;
@@ -2451,7 +2459,6 @@
             save();
 
             var sp = getStageProgress(id, stageKey);
-            document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
             document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
 
             var items = document.querySelectorAll("#modalRequirements li");
@@ -2483,14 +2490,17 @@
                         delete state.done[id + "-" + stageKey + "-" + r];
                     }
                 }
-                renderStageRequirements(id, state.currentStage);
-                var sp = getStageProgress(id, state.currentStage);
-                document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
-                document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
+                // Re-render current view
+                if (state.modalView === 'stageDetail') {
+                    openStage(id, state.currentStage);
+                } else {
+                    showStageList(id);
+                }
             } else {
                 for (var i = 0; i < b.reqs.length; i++) {
                     delete state.done[id + "-" + i];
                 }
+                // Re-render
                 var p = getProgress(id);
                 document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
@@ -2512,9 +2522,11 @@
         // ============================================================
 
         document.getElementById("modalClose").onclick = closeModal;
+
         document.getElementById("modalOverlay").onclick = function(e) {
             if (e.target === this) closeModal();
         };
+
         document.getElementById("modalReset").onclick = resetBadge;
 
         document.getElementById("modalFavBtn").onclick = function() {
@@ -2535,12 +2547,29 @@
         document.getElementById("searchBox").oninput = function() {
             state.search = this.value;
             renderAll();
-            // Scroll to top to see results
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        // Handle hardware back button / swipe on Android
+        window.addEventListener('popstate', function(e) {
+            if (handleBack()) {
+                // Prevent default back behavior if we handled it
+                e.preventDefault();
+                // Push state back to maintain history
+                history.pushState(null, null, window.location.href);
+            }
+        });
+
+        // Push initial state for back button handling
+        history.pushState(null, null, window.location.href);
+
+        // Also handle Escape key
         document.onkeydown = function(e) {
-            if (e.key === "Escape") closeModal();
+            if (e.key === "Escape") {
+                if (handleBack()) {
+                    e.preventDefault();
+                }
+            }
         };
 
         // ============================================================
