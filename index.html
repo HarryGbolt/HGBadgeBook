@@ -37,7 +37,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* ===== BADGE LIST - One per row ===== */
         .badge-list {
             padding: 8px 16px 16px;
         }
@@ -119,7 +118,6 @@
             color: #2e7d32;
         }
 
-        /* ===== SECTION HEADER ===== */
         .section-header {
             padding: 16px 16px 6px;
             font-size: 18px;
@@ -145,7 +143,6 @@
             margin-bottom: 12px;
         }
 
-        /* ===== STAGE LIST ITEMS ===== */
         .stage-list-item {
             display: flex;
             align-items: center;
@@ -196,7 +193,6 @@
             color: #2e7d32;
         }
 
-        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -462,7 +458,6 @@
             border-radius: 4px;
         }
 
-        /* ===== BOTTOM NAV - iOS style ===== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -536,7 +531,6 @@
             opacity: 1;
         }
 
-        /* ===== SEARCH IN BOTTOM NAV ===== */
         .nav-search {
             display: flex;
             align-items: center;
@@ -546,6 +540,10 @@
             margin: 0 4px;
             flex: 1;
             max-width: 120px;
+            transition: background 0.2s;
+        }
+        .nav-search:focus-within {
+            background: #e8eaf0;
         }
         .nav-search input {
             border: none;
@@ -566,7 +564,6 @@
             margin-right: 4px;
         }
 
-        /* ===== PAGES ===== */
         .page {
             display: none;
         }
@@ -592,28 +589,29 @@
         .search-wrap {
             display: none;
         }
+
+        /* Scroll padding for search */
+        .scroll-container {
+            padding-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <div class="header">
         <div class="header-top">
             <h1>Explorer Badge Tracker</h1>
         </div>
     </div>
 
-    <!-- ===== PAGE: HOME ===== -->
     <div class="page active" id="pageHome">
         <div id="badgeContainer"></div>
     </div>
 
-    <!-- ===== PAGE: FAVOURITES ===== -->
     <div class="page" id="pageFavourites">
         <div id="favouritesContainer"></div>
     </div>
 
-    <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalContent">
             <div class="modal-header">
@@ -648,7 +646,6 @@
         </div>
     </div>
 
-    <!-- ===== BOTTOM NAV ===== -->
     <div class="bottom-nav" id="bottomNav">
         <button class="nav-item active" data-page="home">
             <span class="nav-icon">🏠</span>
@@ -2231,16 +2228,13 @@
                 }
             });
 
-            var searchWrap = document.querySelector('.search-wrap');
-            if (page === 'home') {
-                searchWrap.style.display = 'block';
-            } else {
-                searchWrap.style.display = 'none';
-            }
-
             if (page === 'favourites') {
                 document.getElementById('searchBox').value = '';
                 state.search = '';
+                // Hide search on favourites
+                document.querySelector('.nav-search').style.display = 'none';
+            } else {
+                document.querySelector('.nav-search').style.display = 'flex';
             }
 
             renderAll();
@@ -2541,6 +2535,8 @@
         document.getElementById("searchBox").oninput = function() {
             state.search = this.value;
             renderAll();
+            // Scroll to top to see results
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         document.onkeydown = function(e) {
