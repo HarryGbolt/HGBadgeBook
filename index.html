@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Explorer Badge Tracker</title>
     <style>
-        /* ===== RESET ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -19,7 +18,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, #2d1b69 0%, #4a2c8a 100%);
             color: white;
@@ -43,6 +41,9 @@
             padding: 12px 16px;
             background: white;
             border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 68px;
+            z-index: 50;
         }
         .search-wrap input {
             width: 100%;
@@ -60,112 +61,76 @@
             color: #aaa;
         }
 
-        .section-header {
-            padding: 16px 16px 8px;
-            font-size: 17px;
-            font-weight: 700;
-            color: #1a1a2e;
-            background: #f2f4f8;
-        }
-        .section-header .count {
-            font-size: 13px;
-            font-weight: 500;
-            color: #888;
-            margin-left: 8px;
-        }
-
-        .badge-list {
-            padding: 0 16px;
-        }
-
-        .list-item {
-            display: flex;
-            align-items: center;
+        /* ===== BADGE GRID - 2 columns, large cards ===== */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 14px;
+            padding: 12px 16px 16px;
+        }
+
+        .badge-card {
             background: white;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 16px 12px 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             cursor: pointer;
             transition: all 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             border: 1px solid rgba(0, 0, 0, 0.02);
-            position: relative;
+            min-height: 180px;
+            justify-content: space-between;
         }
-        .list-item:active {
-            transform: scale(0.98);
-            background: #f8f8fc;
+        .badge-card:active {
+            transform: scale(0.96);
         }
-        .list-item .icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
+        .badge-card .badge-image {
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 6px;
             flex-shrink: 0;
-            overflow: hidden;
-            background: #f5f3ff;
         }
-        .list-item .icon img {
+        .badge-card .badge-image img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            padding: 4px;
         }
-        .list-item .info {
-            flex: 1;
-            min-width: 0;
-        }
-        .list-item .info .name {
-            font-size: 15px;
+        .badge-card .badge-name {
+            font-size: 14px;
             font-weight: 600;
+            line-height: 1.3;
             color: #1a1a2e;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 1.3;
-            line-clamp: 2;
+            min-height: 36px;
+            max-height: 36px;
         }
-        .list-item .info .meta {
-            font-size: 12px;
-            color: #888;
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .list-item .info .meta .type {
-            background: #f0f0f5;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 10px;
+        .badge-card .badge-status {
+            font-size: 11px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            color: #888;
-        }
-        .list-item .status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 12px;
+            padding: 3px 12px;
             border-radius: 12px;
-            flex-shrink: 0;
-            text-align: center;
+            margin-top: 6px;
             min-width: 70px;
         }
-        .list-item .status.not-started {
+        .badge-card .badge-status.not-started {
             background: #f0f0f5;
             color: #888;
         }
-        .list-item .status.in-progress {
+        .badge-card .badge-status.in-progress {
             background: #e3f0ff;
             color: #4a2c8a;
         }
-        .list-item .status.complete {
+        .badge-card .badge-status.complete {
             background: #e6f7e6;
             color: #2e7d32;
         }
@@ -174,6 +139,7 @@
             text-align: center;
             padding: 60px 20px;
             color: #999;
+            grid-column: 1 / -1;
         }
         .empty .big {
             font-size: 48px;
@@ -181,7 +147,7 @@
             margin-bottom: 12px;
         }
 
-        /* ===== FULL SCREEN MODAL ===== */
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -200,7 +166,6 @@
         .modal-overlay.show {
             display: flex;
         }
-
         .modal {
             background: white;
             width: 100%;
@@ -214,7 +179,6 @@
             display: flex;
             flex-direction: column;
         }
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -225,7 +189,6 @@
                 transform: translateY(0);
             }
         }
-
         .modal-header {
             background: linear-gradient(135deg, #2d1b69 0%, #4a2c8a 100%);
             color: white;
@@ -313,7 +276,6 @@
             flex: 1;
             overflow-y: auto;
         }
-
         .modal-body .stage-selector {
             display: flex;
             align-items: center;
@@ -352,7 +314,6 @@
             font-weight: 600;
             margin-left: auto;
         }
-
         .modal-body .requirements-title {
             font-size: 17px;
             font-weight: 700;
@@ -435,12 +396,31 @@
             .modal-overlay {
                 align-items: center;
             }
-            .list-item {
-                padding: 14px 18px;
+            .badge-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             }
-            .list-item .icon {
-                width: 56px;
-                height: 56px;
+            .badge-card .badge-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        @media (max-width: 400px) {
+            .badge-grid {
+                gap: 10px;
+                padding: 10px 12px 12px;
+            }
+            .badge-card {
+                min-height: 150px;
+                padding: 12px 10px 10px;
+            }
+            .badge-card .badge-image {
+                width: 64px;
+                height: 64px;
+            }
+            .badge-card .badge-name {
+                font-size: 12px;
+                min-height: 30px;
+                max-height: 30px;
             }
         }
 
@@ -455,7 +435,7 @@
             border-radius: 4px;
         }
 
-        /* ===== BOTTOM NAV ===== */
+        /* ===== BOTTOM NAV - iOS style ===== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -466,31 +446,32 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 0 env(safe-area-inset-bottom);
+            padding: 6px 0 env(safe-area-inset-bottom);
             z-index: 150;
-            height: 64px;
+            height: 60px;
             box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
         }
         .bottom-nav .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 1px;
             background: none;
             border: none;
             font-size: 10px;
             color: #aaa;
             cursor: pointer;
-            padding: 4px 16px;
+            padding: 4px 20px;
             transition: color 0.2s;
             position: relative;
             -webkit-tap-highlight-color: transparent;
         }
         .bottom-nav .nav-item .nav-icon {
-            font-size: 24px;
+            font-size: 26px;
             line-height: 1;
             opacity: 0.4;
             transition: opacity 0.2s;
+            filter: grayscale(100%);
         }
         .bottom-nav .nav-item .nav-label {
             font-size: 10px;
@@ -500,6 +481,7 @@
         }
         .bottom-nav .nav-item.active .nav-icon {
             opacity: 1;
+            filter: grayscale(0%);
         }
         .bottom-nav .nav-item.active .nav-label {
             opacity: 1;
@@ -549,6 +531,11 @@
             font-size: 16px;
             line-height: 1.6;
         }
+
+        /* No section headers - everything is connected */
+        .section-header {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -565,12 +552,12 @@
         <div class="search-wrap">
             <input type="text" id="searchBox" placeholder="🔍 Search badges..." />
         </div>
-        <div id="badgeContainer"></div>
+        <div class="badge-grid" id="badgeContainer"></div>
     </div>
 
     <!-- ===== PAGE: FAVOURITES ===== -->
     <div class="page" id="pageFavourites">
-        <div id="favouritesContainer"></div>
+        <div class="badge-grid" id="favouritesContainer"></div>
     </div>
 
     <!-- ===== MODAL ===== -->
@@ -1057,7 +1044,7 @@
             },
 
             // =========================================================
-            // STAGED BADGES (15)
+            // STAGED BADGES (15) - truncated for length, full data in final
             // =========================================================
 
             "staged-air-activities": {
@@ -1066,12 +1053,9 @@
                 image: "https://prod-cms.scouts.org.uk/media/4475/raf_staged-activities_air-acitivities_stage-1-cmyk.png",
                 isStaged: true,
                 stages: {
-                    "1": [
-                        "Make a paper aircraft and test how well it flies",
-                        "Identify four different types of aircraft",
+                    "1": ["Make a paper aircraft and test how well it flies", "Identify four different types of aircraft",
                         "Describe any aircraft you'd like to fly in and explain why",
-                        "Talk to someone who's flown in an aircraft",
-                        "Learn about the different jobs an aircraft can do"
+                        "Talk to someone who's flown in an aircraft", "Learn about the different jobs an aircraft can do"
                     ],
                     "2": [
                         "Make an aircraft out of recycled materials and try to make it fly",
@@ -2046,49 +2030,19 @@
                 return;
             }
 
-            var html = "";
-            var catLabels = {
-                activity: "Activity",
-                staged: "Staged",
-                challenge: "Challenge",
-                top: "Top Award"
-            };
+            // No section headers - everything in one grid
+            var html = '';
+            for (var i = 0; i < allIds.length; i++) {
+                var id = allIds[i];
+                var b = BADGES[id];
+                var p = getProgress(id);
+                var statusText = getStatusText(p.pct);
+                var statusClass = getStatusClass(p.pct);
 
-            var showHeaders = (state.currentPage === "home");
-
-            for (var s = 0; s < SECTION_ORDER.length; s++) {
-                var section = SECTION_ORDER[s];
-                var badgeIds = getBadgesByCategory(section.key);
-
-                if (badgeIds.length === 0) continue;
-
-                if (showHeaders) {
-                    html += '<div class="section-header">' + section.label + ' <span class="count">' + badgeIds.length +
-                        '</span></div>';
-                }
-                html += '<div class="badge-list">';
-
-                for (var i = 0; i < badgeIds.length; i++) {
-                    var id = badgeIds[i];
-                    var b = BADGES[id];
-                    var p = getProgress(id);
-                    var statusText = getStatusText(p.pct);
-                    var statusClass = getStatusClass(p.pct);
-
-                    html += '<div class="list-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
-                    html += '<div class="icon">' + getImageHtml(b) + '</div>';
-                    html += '<div class="info">';
-                    html += '<div class="name">' + b.name + '</div>';
-                    html += '<div class="meta">';
-                    if (showHeaders) {
-                        html += '<span class="type">' + (catLabels[b.cat] || b.cat) + '</span>';
-                    }
-                    html += '</div>';
-                    html += '</div>';
-                    html += '<div class="status ' + statusClass + '">' + statusText + '</div>';
-                    html += '</div>';
-                }
-
+                html += '<div class="badge-card" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
+                html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
+                html += '<div class="badge-name">' + b.name + '</div>';
+                html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                 html += '</div>';
             }
 
@@ -2105,15 +2059,7 @@
                 return;
             }
 
-            var html = "";
-            var catLabels = {
-                activity: "Activity",
-                staged: "Staged",
-                challenge: "Challenge",
-                top: "Top Award"
-            };
-
-            html += '<div class="badge-list">';
+            var html = '';
             for (var i = 0; i < favIds.length; i++) {
                 var id = favIds[i];
                 var b = BADGES[id];
@@ -2122,18 +2068,12 @@
                 var statusText = getStatusText(p.pct);
                 var statusClass = getStatusClass(p.pct);
 
-                html += '<div class="list-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
-                html += '<div class="icon">' + getImageHtml(b) + '</div>';
-                html += '<div class="info">';
-                html += '<div class="name">' + b.name + '</div>';
-                html += '<div class="meta">';
-                html += '<span class="type">' + (catLabels[b.cat] || b.cat) + '</span>';
-                html += '</div>';
-                html += '</div>';
-                html += '<div class="status ' + statusClass + '">' + statusText + '</div>';
+                html += '<div class="badge-card" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
+                html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
+                html += '<div class="badge-name">' + b.name + '</div>';
+                html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                 html += '</div>';
             }
-            html += '</div>';
 
             container.innerHTML = html;
         }
