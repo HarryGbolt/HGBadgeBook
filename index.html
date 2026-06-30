@@ -559,9 +559,9 @@
             display: none;
         }
 
-        /* Scroll restoration container */
         #scrollContainer {
             min-height: 100vh;
+            padding-top: 4px;
         }
     </style>
 </head>
@@ -1977,7 +1977,7 @@
             currentStage: "1",
             favourites: [],
             currentPage: "home",
-            modalView: null, // 'stageList' or 'stageDetail'
+            modalView: null,
             scrollPosition: 0
         };
 
@@ -2083,7 +2083,33 @@
             return { done: done, total: reqs.length, pct: reqs.length > 0 ? Math.round((done / reqs.length) * 100) : 0 };
         }
 
-        function getStatusText(pct) {
+        function getStatusText(id) {
+            var badge = BADGES[id];
+            if (!badge) return "Not Started";
+            
+            // For activity badges with "choose" property
+            if (badge.choose && badge.totalOptions) {
+                var done = 0;
+                for (var i = 0; i < badge.reqs.length; i++) {
+                    if (state.done[id + "-" + i]) done++;
+                }
+                if (done >= badge.choose) return "Complete";
+                if (done > 0) return "In Progress";
+                return "Not Started";
+            }
+            
+            // For staged badges
+            if (badge.isStaged && badge.stages) {
+                var p = getProgress(id);
+                return getStatusTextFromPct(p.pct);
+            }
+            
+            // For regular badges (all requirements needed)
+            var p = getProgress(id);
+            return getStatusTextFromPct(p.pct);
+        }
+
+        function getStatusTextFromPct(pct) {
             if (pct === 100) return "Complete";
             if (pct > 0) return "In Progress";
             return "Not Started";
@@ -2160,7 +2186,7 @@
                     var id = badgeIds[i];
                     var b = BADGES[id];
                     var p = getProgress(id);
-                    var statusText = getStatusText(p.pct);
+                    var statusText = getStatusText(id);
                     var statusClass = getStatusClass(p.pct);
 
                     html += '<div class="badge-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
@@ -2192,7 +2218,7 @@
                 var b = BADGES[id];
                 if (!b) continue;
                 var p = getProgress(id);
-                var statusText = getStatusText(p.pct);
+                var statusText = getStatusText(id);
                 var statusClass = getStatusClass(p.pct);
 
                 html += '<div class="badge-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
@@ -2232,7 +2258,6 @@
                 document.querySelector('.nav-search').style.display = 'none';
             } else {
                 document.querySelector('.nav-search').style.display = 'flex';
-                // Restore scroll position when returning to home
                 if (page === 'home' && state.scrollPosition > 0) {
                     setTimeout(function() {
                         window.scrollTo(0, state.scrollPosition);
@@ -2248,7 +2273,6 @@
         // ============================================================
 
         function openModal(id) {
-            // Save scroll position before opening modal
             state.scrollPosition = window.scrollY;
 
             var b = BADGES[id];
@@ -2411,20 +2435,7 @@
                 return;
             }
 
-            // If in stage list, close modal and restore scroll
-            if (state.modalView === 'stageList') {
-                document.getElementById("modalOverlay").className = "modal-overlay";
-                document.body.style.overflow = "";
-                state.current = null;
-                state.modalView = null;
-                // Restore scroll position when closing from stage list
-                setTimeout(function() {
-                    window.scrollTo(0, state.scrollPosition);
-                }, 50);
-                return;
-            }
-
-            // Otherwise close modal and restore scroll
+            // If in stage list, close modal (goes to home)
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
             state.current = null;
@@ -2440,19 +2451,15 @@
         // ============================================================
 
         function goBack() {
-            // If modal is open
             if (document.getElementById("modalOverlay").className === "modal-overlay show") {
-                // If in stage detail, go back to stage list
                 if (state.modalView === 'stageDetail' && state.current) {
                     showStageList(state.current);
                     return true;
                 }
-                // If in stage list, close modal (goes to home)
                 if (state.modalView === 'stageList') {
                     closeModal();
                     return true;
                 }
-                // Otherwise close modal
                 closeModal();
                 return true;
             }
@@ -2551,12 +2558,10 @@
         // ============================================================
 
         document.getElementById("modalClose").onclick = function() {
-            // If in stage detail, go back to stage list
             if (state.modalView === 'stageDetail' && state.current) {
                 showStageList(state.current);
                 return;
             }
-            // Otherwise close
             closeModal();
         };
 
@@ -2577,7 +2582,6 @@
 
         document.querySelectorAll('.nav-item').forEach(function(item) {
             item.onclick = function() {
-                // Save scroll position before navigating
                 state.scrollPosition = window.scrollY;
                 navigateTo(this.dataset.page);
             };
@@ -2586,23 +2590,20 @@
         document.getElementById("searchBox").oninput = function() {
             state.search = this.value;
             renderAll();
-            // Scroll to top to see results
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 50);
         };
 
-        // Handle hardware back button / swipe on Android
         window.addEventListener('popstate', function(e) {
             if (goBack()) {
                 e.preventDefault();
-                // Push state back to maintain history
                 history.pushState(null, null, window.location.href);
             }
         });
 
-        // Push initial state for back button handling
         history.pushState(null, null, window.location.href);
 
-        // Also handle Escape key
         document.onkeydown = function(e) {
             if (e.key === "Escape") {
                 if (goBack()) {
