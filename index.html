@@ -61,85 +61,107 @@
             color: #aaa;
         }
 
-        /* ===== BADGE GRID - 2 columns, large cards ===== */
-        .badge-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            padding: 12px 16px 16px;
+        /* ===== BADGE LIST - One per row ===== */
+        .badge-list {
+            padding: 8px 16px 16px;
         }
 
-        .badge-card {
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             background: white;
             border-radius: 16px;
-            padding: 16px 12px 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             cursor: pointer;
             transition: all 0.15s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
             border: 1px solid rgba(0, 0, 0, 0.02);
-            min-height: 180px;
-            justify-content: space-between;
+            min-height: 90px;
         }
-        .badge-card:active {
-            transform: scale(0.96);
+        .badge-item:active {
+            transform: scale(0.98);
+            background: #f8f8fc;
         }
-        .badge-card .badge-image {
-            width: 80px;
-            height: 80px;
+        .badge-item .badge-image {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
-            flex-shrink: 0;
+            background: #f5f3ff;
+            border-radius: 12px;
+            overflow: hidden;
         }
-        .badge-card .badge-image img {
+        .badge-item .badge-image img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            padding: 6px;
         }
-        .badge-card .badge-name {
-            font-size: 14px;
+        .badge-item .badge-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .badge-item .badge-info .name {
+            font-size: 16px;
             font-weight: 600;
-            line-height: 1.3;
             color: #1a1a2e;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            min-height: 36px;
-            max-height: 36px;
+            line-height: 1.3;
         }
-        .badge-card .badge-status {
-            font-size: 11px;
+        .badge-item .badge-info .category {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .badge-item .badge-status {
+            font-size: 12px;
             font-weight: 600;
-            padding: 3px 12px;
+            padding: 4px 14px;
             border-radius: 12px;
-            margin-top: 6px;
-            min-width: 70px;
+            flex-shrink: 0;
+            text-align: center;
+            min-width: 80px;
         }
-        .badge-card .badge-status.not-started {
+        .badge-item .badge-status.not-started {
             background: #f0f0f5;
             color: #888;
         }
-        .badge-card .badge-status.in-progress {
+        .badge-item .badge-status.in-progress {
             background: #e3f0ff;
             color: #4a2c8a;
         }
-        .badge-card .badge-status.complete {
+        .badge-item .badge-status.complete {
             background: #e6f7e6;
             color: #2e7d32;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            padding: 16px 16px 6px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+            background: #f2f4f8;
+        }
+        .section-header .count {
+            font-size: 13px;
+            font-weight: 500;
+            color: #888;
+            margin-left: 8px;
         }
 
         .empty {
             text-align: center;
             padding: 60px 20px;
             color: #999;
-            grid-column: 1 / -1;
         }
         .empty .big {
             font-size: 48px;
@@ -396,31 +418,9 @@
             .modal-overlay {
                 align-items: center;
             }
-            .badge-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-            .badge-card .badge-image {
-                width: 100px;
-                height: 100px;
-            }
-        }
-        @media (max-width: 400px) {
-            .badge-grid {
-                gap: 10px;
-                padding: 10px 12px 12px;
-            }
-            .badge-card {
-                min-height: 150px;
-                padding: 12px 10px 10px;
-            }
-            .badge-card .badge-image {
-                width: 64px;
-                height: 64px;
-            }
-            .badge-card .badge-name {
-                font-size: 12px;
-                min-height: 30px;
-                max-height: 30px;
+            .badge-item .badge-image {
+                width: 80px;
+                height: 80px;
             }
         }
 
@@ -531,11 +531,6 @@
             font-size: 16px;
             line-height: 1.6;
         }
-
-        /* No section headers - everything is connected */
-        .section-header {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -552,12 +547,12 @@
         <div class="search-wrap">
             <input type="text" id="searchBox" placeholder="🔍 Search badges..." />
         </div>
-        <div class="badge-grid" id="badgeContainer"></div>
+        <div id="badgeContainer"></div>
     </div>
 
     <!-- ===== PAGE: FAVOURITES ===== -->
     <div class="page" id="pageFavourites">
-        <div class="badge-grid" id="favouritesContainer"></div>
+        <div id="favouritesContainer"></div>
     </div>
 
     <!-- ===== MODAL ===== -->
@@ -622,6 +617,7 @@
             "action-sports": {
                 name: "Action Sports",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/uhcf2wnp/activitybadge_ex_action-sports_rgb.png",
                 reqs: [
                     "Take part in at least one session of an Action Sport of your choice. Ensure that supervision is provided by an appropriately qualified person if your action sport requires one.",
@@ -636,6 +632,7 @@
             "athletics": {
                 name: "Athletics",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/xpjeykyc/activitybadge_ex_athletics_rgb.png",
                 reqs: [
                     "Discover - Look into the science behind how athletes improve their speed or strength. Can you put some into practice as a group?",
@@ -649,6 +646,7 @@
             "camper": {
                 name: "Camper",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ho1fqdjz/activitybadge_ex_camper_with-cologo_rgb.png",
                 reqs: [
                     "Camp outdoors for a total of seven nights across two events or more as an Explorer, including at least three nights as part of this badge.",
@@ -663,6 +661,7 @@
             "caving": {
                 name: "Caving",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/k50l5tge/activitybadge_ex_caving_rgb.png",
                 reqs: [
                     "Take part in at least one caving trip as part of completing this badge. Make sure your trip is supervised by an appropriately qualified person.",
@@ -677,6 +676,7 @@
             "chef": {
                 name: "Chef",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/youpgydq/activitybadge_ex_chef_rgb.png",
                 reqs: [
                     "Discover - Choose a recipe, a cooking technique or a traditional food, and find out about its history. Have a go at making something using traditional methods and ingredients.",
@@ -690,6 +690,7 @@
             "climber": {
                 name: "Climber",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/j52dlila/activitybadge_ex_climber_rgb.png",
                 reqs: [
                     "Take part in at least two sessions of climbing, indoor or out, while completing this badge. Make sure your session is supervised by an appropriately qualified person.",
@@ -704,6 +705,7 @@
             "coach": {
                 name: "Coach",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/oebhs0t0/activitybadge_ex_instructor_a_rgb.png",
                 reqs: [
                     "Discover - Learn about different coaching techniques, like how to break down skills or keep a group motivated. Demonstrate these to your Unit.",
@@ -717,6 +719,7 @@
             "communication": {
                 name: "Communication",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/rxxc0ezv/activitybadge_ex_communication_rgb.png",
                 reqs: [
                     "Discover - Find out about digital footprints. Research yourself online and find out what information someone could find out about you if they tried.",
@@ -730,6 +733,7 @@
             "content-creation": {
                 name: "Content Creation",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/reqbj5pz/activitybadge_ex_content_creation_rgb.png",
                 reqs: [
                     "Discover - Explore how digital content can shape opinions, build communities, and influence change. Learn about ethical storytelling and audience responsibility.",
@@ -743,6 +747,7 @@
             "creative-arts": {
                 name: "Creative Arts",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/kj3cn2i4/activitybadge_ex_creative_arts_rgb.png",
                 reqs: [
                     "Discover - Find out about an artist, craftsperson or arts organisation and their work. What or who inspired them? How did they get started?",
@@ -756,6 +761,7 @@
             "democracy": {
                 name: "Democracy",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/bpsb1ntb/activitybadge_ex_democracy_rgb.png",
                 reqs: [
                     "Discover - Explore the history of democracy in your country. This could include how it works, people's rights, who could vote, and how people have influenced decisions.",
@@ -769,6 +775,7 @@
             "employability-skills": {
                 name: "Employability Skills",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4tapvf0m/activitybadge_ex_employability_skills_rgb.png",
                 reqs: [
                     "Discover - Research the transferrable soft skills that Employers look for. Identify how your time in Explorers may contribute to these skills.",
@@ -782,6 +789,7 @@
             "exploration": {
                 name: "Exploration",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/3imhuezd/activitybadge_ex_exploration_rgb.png",
                 reqs: [
                     "Discover - Investigate the life and impact of an explorer. Choose a historical or contemporary explorer and research their journey and impact.",
@@ -795,6 +803,7 @@
             "fundraising": {
                 name: "Fundraising",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/bvcg03ky/activitybadge_ex_fundraising_rgb.png",
                 reqs: [
                     "Discover - Research a charity of your choice to find out how they go about fundraising. This could be a global charity or a smaller local charity.",
@@ -808,6 +817,7 @@
             "global-issues": {
                 name: "Global Issues",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/bwuafjft/activitybadge_ex_global_issues_rgb.png",
                 reqs: [
                     "Discover - Interview someone from a different country or background about a global issue that affects their community.",
@@ -821,6 +831,7 @@
             "hill-walker": {
                 name: "Hill Walker",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/tb0c0uj1/activitybadge_ex_hill_walker_rgb.png",
                 reqs: [
                     "Take part in at least two journeys in terrain 2 areas. An appropriately qualified person must accompany or supervise the journeys.",
@@ -835,6 +846,7 @@
             "hobbies": {
                 name: "Hobbies",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/jz0brzzn/activitybadge_ex_hobbies_rgb.png",
                 reqs: [
                     "Discover - Explore how hobbies help people define who they are. Meet some people of different ages and ask them about how their hobbies have shaped their identity.",
@@ -848,6 +860,7 @@
             "leadership": {
                 name: "Leadership",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/sa2cpqvi/activitybadge_ex_leadership_rgb.png",
                 reqs: [
                     "Discover - Learn about the different types of Leadership style. Take part in a quiz to find out what your leadership style is.",
@@ -861,6 +874,7 @@
             "life-skills": {
                 name: "Life Skills",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/d43eojis/activitybadge_ex_life-skills_rgb.png",
                 reqs: [
                     "Discover - Find out how to properly wash, dry, and care for different types of clothing, including reading care labels and choosing the right settings.",
@@ -874,6 +888,7 @@
             "money-skills": {
                 name: "Money Skills",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/yhfomxvy/activitybadge_ex_money-skills_rgb.png",
                 reqs: [
                     "Discover - Understand how money works and what affects the way we use it. Find out what shapes your spending habits.",
@@ -887,6 +902,7 @@
             "nature": {
                 name: "Nature",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/j1ljfk24/activitybadge_ex_naturalist_rgb.png",
                 reqs: [
                     "Discover - Choose an area of the natural world, explore the conservation and environmental impact of that area.",
@@ -900,6 +916,7 @@
             "performing-arts": {
                 name: "Performing Arts",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ny0jvuwu/activitybadge_ex_performing_arts_rgb.png",
                 reqs: [
                     "Discover - Research the job roles that exist in the theatre. Spend some time finding out the details involved in working in one of these roles.",
@@ -913,6 +930,7 @@
             "personal-safety": {
                 name: "Personal Safety",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/1qrndx5g/activitybadge_ex_personal_safety_rgb.png",
                 reqs: [
                     "Discover - Compare how teenagers and adults think about risk and safety in everyday situations.",
@@ -926,6 +944,7 @@
             "pioneering": {
                 name: "Pioneering",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/fgod0fsz/activitybadge_ex_pioneering_rgb.png",
                 reqs: [
                     "Take part in at least one large scale Pioneering project. You should complete your project over the course of a day.",
@@ -940,6 +959,7 @@
             "problem-solver": {
                 name: "Problem Solver",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/xvbikg54/activitybadge_ex_problem-solver_rgb.png",
                 reqs: [
                     "Discover - Identify a real issue affecting your local area, such as housing, transport, youth services, or environmental concerns.",
@@ -953,6 +973,7 @@
             "stem": {
                 name: "S.T.E.M",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/mvldi5zd/activitybadge_ex_stem_with_rr_logo_rgb.png",
                 reqs: [
                     "Discover - Investigate how gas turbines power everyday life. Choose a real-world example and explain how gas turbines are used.",
@@ -966,6 +987,7 @@
             "space": {
                 name: "Space",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/x1cprc4f/activitybadge_ex_space_rgb.png",
                 reqs: [
                     "Discover - Explore first-hand accounts from people who have been involved in the space industry or witnessed its impact.",
@@ -979,6 +1001,7 @@
             "sports-and-fitness": {
                 name: "Sports and Fitness",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/zythaa3e/activitybadge_ex_physical_recreation_rgb.png",
                 reqs: [
                     "Discover - Choose three sports that interest you and research them. What training regimes do they have? What's different about them, and what's similar?",
@@ -992,6 +1015,7 @@
             "survival-skills": {
                 name: "Survival Skills",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4gdg4wsh/activitybadge_ex_survival-skills_rgb.png",
                 reqs: [
                     "Discover - Research and demonstrate different methods of building and lighting fires in outdoor environments, including their advantages and risks.",
@@ -1005,6 +1029,7 @@
             "teamwork": {
                 name: "Teamwork",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/hsyfjy0n/activitybadge_ex_teamwork_rgb.png",
                 reqs: [
                     "Discover - Find out about a local team which is working in your community or local Scouting area.",
@@ -1018,6 +1043,7 @@
             "try-new-things": {
                 name: "Try New Things",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/jmoltp0c/activitybadge_ex_try-new-things_rgb.png",
                 reqs: [
                     "Discover - Explore why stepping outside your comfort zone matters for personal growth, innovation, and resilience.",
@@ -1031,6 +1057,7 @@
             "water-activities": {
                 name: "Water Activities",
                 cat: "activity",
+                categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ejhhwsmm/activitybadge_ex_water-activities_rgb.png",
                 reqs: [
                     "Take part in at least two activities that take place on or in the water while earning this badge. The activity should be supervised by an appropriately qualified person.",
@@ -1044,12 +1071,13 @@
             },
 
             // =========================================================
-            // STAGED BADGES (15) - truncated for length, full data in final
+            // STAGED BADGES (15) - Full data included
             // =========================================================
 
             "staged-air-activities": {
                 name: "Air Activities (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4475/raf_staged-activities_air-acitivities_stage-1-cmyk.png",
                 isStaged: true,
                 stages: {
@@ -1088,6 +1116,7 @@
             "staged-community-impact": {
                 name: "Community Impact (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4456/staged-community.png",
                 isStaged: true,
                 stages: {
@@ -1125,6 +1154,7 @@
             "staged-digital-citizen": {
                 name: "Digital Citizen (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4457/staged-digital-citizen.png",
                 isStaged: true,
                 stages: {
@@ -1161,6 +1191,7 @@
             "staged-digital-maker": {
                 name: "Digital Maker (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/6450/raspberry_pi_1-01.png",
                 isStaged: true,
                 stages: {
@@ -1194,6 +1225,7 @@
             "staged-emergency-aid": {
                 name: "Emergency Aid (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4459/staged-emergency-aid.png",
                 isStaged: true,
                 stages: {
@@ -1271,6 +1303,7 @@
             "staged-hikes-away": {
                 name: "Hikes Away (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/19907/hikes-away-02-01-1.png",
                 isStaged: true,
                 stages: {
@@ -1320,6 +1353,7 @@
             "staged-musician": {
                 name: "Musician (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4461/staged-musician.png",
                 isStaged: true,
                 stages: {
@@ -1371,6 +1405,7 @@
             "staged-nautical-skills": {
                 name: "Nautical Skills (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4462/staged-nautical.png",
                 isStaged: true,
                 stages: {
@@ -1435,6 +1470,7 @@
             "staged-navigator": {
                 name: "Navigator (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4463/staged-navigator.png",
                 isStaged: true,
                 stages: {
@@ -1490,6 +1526,7 @@
             "staged-nights-away": {
                 name: "Nights Away (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/19908/nights-away-02-01-1.png",
                 isStaged: true,
                 stages: {
@@ -1504,6 +1541,7 @@
             "staged-paddle-sports": {
                 name: "Paddle Sports (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4465/staged-paddle-sports.png",
                 isStaged: true,
                 stages: {
@@ -1542,6 +1580,7 @@
             "staged-sailing": {
                 name: "Sailing (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4466/staged-sailing.png",
                 isStaged: true,
                 stages: {
@@ -1580,6 +1619,7 @@
             "staged-snowsports": {
                 name: "Snowsports (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4467/staged-snowsports.png",
                 isStaged: true,
                 stages: {
@@ -1615,6 +1655,7 @@
             "staged-swimmer": {
                 name: "Swimmer (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/4468/staged-swimmer.png",
                 isStaged: true,
                 stages: {
@@ -1684,6 +1725,7 @@
             "staged-time-on-water": {
                 name: "Time on Water (Staged)",
                 cat: "staged",
+                categoryLabel: "Staged Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ighphwhq/royal-navy-staged-badge-time-on-the-water-2018-rgb_347-x-350px.png",
                 isStaged: true,
                 stages: {
@@ -1708,6 +1750,7 @@
             "challenge-adventure": {
                 name: "Adventure Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/ilud2rrz/challengeaward_ex_adventure_rgb.png",
                 reqs: [
                     "Choose an appropriate adventure challenge to achieve within 6 months",
@@ -1719,6 +1762,7 @@
             "challenge-community": {
                 name: "Community Engagement Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/xxxxx/challengeaward_ex_community_rgb.png",
                 reqs: [
                     "Choose an appropriate community engagement challenge to achieve within 6 months",
@@ -1730,6 +1774,7 @@
             "challenge-employability": {
                 name: "Employability Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/ftypkfni/challengeaward_ex_employability_rgb.png",
                 reqs: [
                     "Choose an appropriate employability challenge to achieve within 6 months",
@@ -1741,6 +1786,7 @@
             "challenge-international": {
                 name: "International Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/hx4djakk/challengeaward_ex_international_rgb.png",
                 reqs: [
                     "Choose an appropriate international challenge to achieve within 6 months",
@@ -1752,6 +1798,7 @@
             "challenge-leadership": {
                 name: "Leadership Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/l0hd3p4h/challengeaward_ex_leadership_-challenge-_rgb.png",
                 reqs: [
                     "Choose an appropriate leadership challenge to achieve within 6 months",
@@ -1763,6 +1810,7 @@
             "challenge-values": {
                 name: "Values Challenge",
                 cat: "challenge",
+                categoryLabel: "Challenge Awards",
                 image: "https://prod-cms.scouts.org.uk/media/pionkvie/challengeaward_ex_values_rgb.png",
                 reqs: [
                     "Choose an appropriate values challenge to achieve within 6 months",
@@ -1779,6 +1827,7 @@
             "chiefs-platinum": {
                 name: "Chief Scout's Platinum Award",
                 cat: "top",
+                categoryLabel: "Top Awards",
                 image: "https://prod-cms.scouts.org.uk/media/3954/chief-scout-platinum-award.png",
                 reqs: [
                     "Be a member of Explorer Scouts for at least 6 months",
@@ -1791,6 +1840,7 @@
             "chiefs-diamond": {
                 name: "Chief Scout's Diamond Award",
                 cat: "top",
+                categoryLabel: "Top Awards",
                 image: "https://prod-cms.scouts.org.uk/media/3952/chief-scout-diamond-award.png",
                 reqs: [
                     "Be a member of Explorer Scouts or Scout Network for at least 12 months",
@@ -1804,6 +1854,7 @@
             "kings-scout": {
                 name: "King's Scout Award",
                 cat: "top",
+                categoryLabel: "Top Awards",
                 image: "https://prod-cms.scouts.org.uk/media/19818/kings-scout-award-graphic.png",
                 reqs: [
                     "Aged 16-25, member of Explorer Scouts or Scout Network for at least 18 months",
@@ -1816,6 +1867,7 @@
             "explorer-belt": {
                 name: "Explorer Belt",
                 cat: "top",
+                categoryLabel: "Top Awards",
                 image: "https://prod-cms.scouts.org.uk/media/3949/explorer-belt-badge.png",
                 reqs: [
                     "Register your intention to complete the award",
@@ -1832,6 +1884,7 @@
             "young-leader": {
                 name: "Young Leader Award",
                 cat: "top",
+                categoryLabel: "Top Awards",
                 image: "https://prod-cms.scouts.org.uk/media/3956/young-leader.png",
                 reqs: [
                     "Attend all 11 Young Leader training modules (A-K)",
@@ -2030,20 +2083,40 @@
                 return;
             }
 
-            // No section headers - everything in one grid
             var html = '';
-            for (var i = 0; i < allIds.length; i++) {
-                var id = allIds[i];
-                var b = BADGES[id];
-                var p = getProgress(id);
-                var statusText = getStatusText(p.pct);
-                var statusClass = getStatusClass(p.pct);
+            var currentSection = '';
 
-                html += '<div class="badge-card" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
-                html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
-                html += '<div class="badge-name">' + b.name + '</div>';
-                html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
-                html += '</div>';
+            // We need to get badges in section order
+            for (var s = 0; s < SECTION_ORDER.length; s++) {
+                var section = SECTION_ORDER[s];
+                var badgeIds = getBadgesByCategory(section.key);
+
+                if (badgeIds.length === 0) continue;
+
+                // Add section header
+                html += '<div class="section-header">' + section.label + ' <span class="count">' + badgeIds.length +
+                    '</span></div>';
+
+                // Add badges in this section
+                for (var i = 0; i < badgeIds.length; i++) {
+                    var id = badgeIds[i];
+                    var b = BADGES[id];
+                    var p = getProgress(id);
+                    var statusText = getStatusText(p.pct);
+                    var statusClass = getStatusClass(p.pct);
+
+                    html += '<div class="badge-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
+                    html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
+                    html += '<div class="badge-info">';
+                    html += '<div class="name">' + b.name + '</div>';
+                    // Show category label only on Home page, not on Favourites
+                    if (state.currentPage === 'home') {
+                        html += '<div class="category">' + b.categoryLabel + '</div>';
+                    }
+                    html += '</div>';
+                    html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
+                    html += '</div>';
+                }
             }
 
             container.innerHTML = html;
@@ -2068,9 +2141,12 @@
                 var statusText = getStatusText(p.pct);
                 var statusClass = getStatusClass(p.pct);
 
-                html += '<div class="badge-card" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
+                html += '<div class="badge-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
                 html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
-                html += '<div class="badge-name">' + b.name + '</div>';
+                html += '<div class="badge-info">';
+                html += '<div class="name">' + b.name + '</div>';
+                html += '<div class="category">' + b.categoryLabel + '</div>';
+                html += '</div>';
                 html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                 html += '</div>';
             }
