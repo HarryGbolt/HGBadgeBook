@@ -220,7 +220,10 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            text-overflow: ellipsis;
             min-height: 36px;
+            max-height: 36px;
+            word-break: break-word;
         }
         .card .badge-meta {
             font-size: 11px;
@@ -494,6 +497,8 @@
             }
             .card .badge-name {
                 font-size: 12px;
+                min-height: 32px;
+                max-height: 32px;
             }
             .card .badge-icon {
                 font-size: 36px;
