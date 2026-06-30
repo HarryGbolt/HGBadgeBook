@@ -14,7 +14,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             background: #f2f4f8;
             color: #1a1a2e;
-            padding-bottom: 40px;
+            padding-bottom: 80px;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -28,38 +28,13 @@
         }
         .header-top {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
         }
         .header-top h1 {
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.5px;
-        }
-        .header-top .header-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-        .header-top .header-actions button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px 6px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .header-top .header-actions button:active {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .header-top .header-actions .fav-count {
-            font-size: 13px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 500;
         }
 
         .search-wrap {
@@ -205,17 +180,6 @@
             transition: width 0.3s;
             width: 0%;
         }
-        .list-item .fav-star {
-            font-size: 16px;
-            opacity: 0.3;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            padding: 4px;
-        }
-        .list-item .fav-star.active {
-            opacity: 1;
-            color: #f5a623;
-        }
 
         .empty {
             text-align: center;
@@ -273,7 +237,6 @@
             }
         }
 
-        /* Modal Header */
         .modal-header {
             background: linear-gradient(135deg, #2d1b69 0%, #4a2c8a 100%);
             color: white;
@@ -350,7 +313,6 @@
             font-weight: 500;
         }
 
-        /* Modal Body */
         .modal-body {
             padding: 20px;
             flex: 1;
@@ -441,7 +403,6 @@
             color: #bbb;
         }
 
-        /* Modal Footer */
         .modal-footer {
             padding: 16px 20px 24px;
             border-top: 1px solid #eee;
@@ -508,48 +469,140 @@
             border-radius: 4px;
         }
 
-        /* Favourites filter indicator */
-        .filter-favs {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #f5a623;
-            color: white;
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 env(safe-area-inset-bottom);
+            z-index: 150;
+            height: 68px;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+        }
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            font-size: 10px;
+            color: #aaa;
             cursor: pointer;
-            transition: all 0.2s;
+            padding: 4px 16px;
+            transition: color 0.2s;
+            position: relative;
         }
-        .filter-favs:active {
-            transform: scale(0.95);
+        .bottom-nav .nav-item .nav-icon {
+            font-size: 26px;
+            line-height: 1;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
-        .filter-favs.active {
-            background: #2d1b69;
+        .bottom-nav .nav-item .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
-        .filter-favs .star {
-            margin-right: 4px;
+        .bottom-nav .nav-item.active .nav-icon {
+            opacity: 1;
+        }
+        .bottom-nav .nav-item.active .nav-label {
+            opacity: 1;
+            color: #4a2c8a;
+        }
+        .bottom-nav .nav-item .nav-badge {
+            position: absolute;
+            top: 0;
+            right: 6px;
+            background: #e74c3c;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .bottom-nav .nav-item .nav-badge.show {
+            opacity: 1;
+        }
+
+        .bottom-nav .nav-item.active .nav-badge.show {
+            opacity: 1;
+        }
+
+        /* ===== PAGES ===== */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header-actions .fav-count {
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        /* ===== FAVOURITES PAGE ===== */
+        .favourites-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+        .favourites-empty .big {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .favourites-empty p {
+            font-size: 16px;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== HEADER ===== -->
     <div class="header">
         <div class="header-top">
             <h1>🏕️ Explorer Tracker</h1>
-            <div class="header-actions">
-                <span class="fav-count" id="favCount">⭐ 0</span>
-                <button id="filterFavsBtn" class="filter-favs" title="Show only favourites">
-                    <span class="star">⭐</span> Favourites
-                </button>
-            </div>
         </div>
     </div>
 
-    <div class="search-wrap">
-        <input type="text" id="searchBox" placeholder="🔍 Search badges..." />
+    <!-- ===== PAGE: HOME ===== -->
+    <div class="page active" id="pageHome">
+        <div class="search-wrap">
+            <input type="text" id="searchBox" placeholder="🔍 Search badges..." />
+        </div>
+        <div id="badgeContainer"></div>
     </div>
 
-    <div id="badgeContainer"></div>
+    <!-- ===== PAGE: FAVOURITES ===== -->
+    <div class="page" id="pageFavourites">
+        <div id="favouritesContainer"></div>
+    </div>
 
     <!-- ===== FULL SCREEN MODAL ===== -->
     <div class="modal-overlay" id="modalOverlay">
@@ -584,6 +637,19 @@
                 <button class="reset-btn" id="modalReset">Reset All</button>
             </div>
         </div>
+    </div>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <div class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-page="home">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" data-page="favourites">
+            <span class="nav-icon">⭐</span>
+            <span class="nav-label">Favourites</span>
+            <span class="nav-badge" id="favBadge">0</span>
+        </button>
     </div>
 
     <script>
@@ -1816,7 +1882,7 @@
             current: null,
             currentStage: "1",
             favourites: [],
-            showFavourites: false
+            currentPage: "home"
         };
 
         function load() {
@@ -1827,7 +1893,6 @@
                     state.done = parsed.done || {};
                     state.currentStage = parsed.currentStage || "1";
                     state.favourites = parsed.favourites || [];
-                    state.showFavourites = parsed.showFavourites || false;
                 }
             } catch (e) {}
         }
@@ -1837,8 +1902,7 @@
                 localStorage.setItem("explorerTracker", JSON.stringify({
                     done: state.done,
                     currentStage: state.currentStage,
-                    favourites: state.favourites,
-                    showFavourites: state.showFavourites
+                    favourites: state.favourites
                 }));
             } catch (e) {}
         }
@@ -1861,6 +1925,7 @@
             save();
             renderAll();
             updateFavButtonUI(id);
+            updateFavBadge();
         }
 
         function updateFavButtonUI(id) {
@@ -1870,17 +1935,16 @@
                 btn.textContent = fav ? "★" : "☆";
                 btn.className = "modal-fav-btn" + (fav ? " active" : "");
             }
-            // Also update the star on the list item if it's visible
-            var star = document.querySelector('.list-item[data-id="' + id + '"] .fav-star');
-            if (star) {
-                star.textContent = fav ? "★" : "☆";
-                star.className = "fav-star" + (fav ? " active" : "");
-            }
-            updateFavCount();
+            updateFavBadge();
         }
 
-        function updateFavCount() {
-            document.getElementById("favCount").textContent = "⭐ " + state.favourites.length;
+        function updateFavBadge() {
+            var badge = document.getElementById("favBadge");
+            if (badge) {
+                var count = state.favourites.length;
+                badge.textContent = count;
+                badge.className = "nav-badge" + (count > 0 ? " show" : "");
+            }
         }
 
         // ============================================================
@@ -1930,8 +1994,8 @@
         function getFiltered() {
             var ids = Object.keys(BADGES);
 
-            // Filter by favourites if enabled
-            if (state.showFavourites) {
+            // On favourites page, only show favourites
+            if (state.currentPage === "favourites") {
                 ids = ids.filter(function(id) {
                     return state.favourites.indexOf(id) !== -1;
                 });
@@ -1959,16 +2023,8 @@
 
         function renderAll() {
             renderList();
-            updateFavCount();
-            updateFilterButtonUI();
-        }
-
-        function updateFilterButtonUI() {
-            var btn = document.getElementById("filterFavsBtn");
-            if (btn) {
-                btn.className = "filter-favs" + (state.showFavourites ? " active" : "");
-                btn.innerHTML = state.showFavourites ? '⭐ Showing Favourites' : '⭐ Favourites';
-            }
+            renderFavourites();
+            updateFavBadge();
         }
 
         function renderList() {
@@ -1976,10 +2032,11 @@
             var allIds = getFiltered();
 
             if (allIds.length === 0) {
-                var msg = state.showFavourites ? 'No favourites yet. Tap the star on any badge to add it!' :
+                var msg = state.currentPage === "favourites" ?
+                    'No favourites yet. Tap the star on any badge to add it!' :
                     'No badges found matching your search.';
                 container.innerHTML =
-                    '<div class="empty"><span class="big">' + (state.showFavourites ? '⭐' : '🔍') +
+                    '<div class="empty"><span class="big">' + (state.currentPage === "favourites" ? '⭐' : '🔍') +
                     '</span><p>' + msg + '</p></div>';
                 return;
             }
@@ -1992,14 +2049,19 @@
                 top: "Top Award"
             };
 
+            // Only show section headers on home page
+            var showHeaders = (state.currentPage === "home");
+
             for (var s = 0; s < SECTION_ORDER.length; s++) {
                 var section = SECTION_ORDER[s];
                 var badgeIds = getBadgesByCategory(section.key);
 
                 if (badgeIds.length === 0) continue;
 
-                html += '<div class="section-header">' + section.label + ' <span class="count">' + badgeIds.length +
-                    '</span></div>';
+                if (showHeaders) {
+                    html += '<div class="section-header">' + section.label + ' <span class="count">' + badgeIds.length +
+                        '</span></div>';
+                }
                 html += '<div class="badge-list">';
 
                 for (var i = 0; i < badgeIds.length; i++) {
@@ -2014,7 +2076,9 @@
                     html += '<div class="info">';
                     html += '<div class="name">' + b.name + '</div>';
                     html += '<div class="meta">';
-                    html += '<span class="type">' + (catLabels[b.cat] || b.cat) + '</span>';
+                    if (showHeaders) {
+                        html += '<span class="type">' + (catLabels[b.cat] || b.cat) + '</span>';
+                    }
                     html += '<span class="progress-text">' + p.done + '/' + p.total + '</span>';
                     html += '</div>';
                     html += '</div>';
@@ -2029,6 +2093,91 @@
             }
 
             container.innerHTML = html;
+        }
+
+        function renderFavourites() {
+            var container = document.getElementById("favouritesContainer");
+            var favIds = state.favourites;
+
+            if (favIds.length === 0) {
+                container.innerHTML =
+                    '<div class="favourites-empty"><span class="big">⭐</span><p>No favourites yet.<br />Tap the star on any badge to save it here!</p></div>';
+                return;
+            }
+
+            // Reuse the same list rendering but without section headers
+            var html = "";
+            var catLabels = {
+                activity: "Activity",
+                staged: "Staged",
+                challenge: "Challenge",
+                top: "Top Award"
+            };
+
+            html += '<div class="badge-list">';
+            for (var i = 0; i < favIds.length; i++) {
+                var id = favIds[i];
+                var b = BADGES[id];
+                if (!b) continue;
+                var p = getProgress(id);
+                var done = p.pct === 100 && p.total > 0;
+
+                html += '<div class="list-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
+                html += '<div class="icon">' + b.emoji + '</div>';
+                html += '<div class="info">';
+                html += '<div class="name">' + b.name + '</div>';
+                html += '<div class="meta">';
+                html += '<span class="type">' + (catLabels[b.cat] || b.cat) + '</span>';
+                html += '<span class="progress-text">' + p.done + '/' + p.total + '</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="progress-bar-mini"><div class="fill" style="width:' + p.pct + '%"></div></div>';
+                html += '<div class="check' + (done ? ' done' : '') + '">✓</div>';
+                html += '<span class="fav-star active" onclick="event.stopPropagation(); toggleFavourite(\'' + id +
+                    '\');">★</span>';
+                html += '</div>';
+            }
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        function navigateTo(page) {
+            state.currentPage = page;
+
+            // Update pages
+            document.querySelectorAll('.page').forEach(function(el) {
+                el.className = 'page';
+            });
+            document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).className = 'page active';
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(function(el) {
+                el.className = 'nav-item';
+                if (el.dataset.page === page) {
+                    el.className = 'nav-item active';
+                }
+            });
+
+            // Update search visibility
+            var searchWrap = document.querySelector('.search-wrap');
+            if (page === 'home') {
+                searchWrap.style.display = 'block';
+            } else {
+                searchWrap.style.display = 'none';
+            }
+
+            // Clear search when switching pages
+            if (page === 'favourites') {
+                document.getElementById('searchBox').value = '';
+                state.search = '';
+            }
+
+            renderAll();
         }
 
         // ============================================================
@@ -2046,7 +2195,6 @@
                 top: "Top Award" };
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
-            // Update favourite button
             updateFavButtonUI(id);
 
             var stageSelector = document.getElementById("stageSelector");
@@ -2242,16 +2390,16 @@
         document.getElementById("modalFavBtn").onclick = function() {
             if (state.current) {
                 toggleFavourite(state.current);
-                // Update the button in the modal
                 updateFavButtonUI(state.current);
             }
         };
 
-        document.getElementById("filterFavsBtn").onclick = function() {
-            state.showFavourites = !state.showFavourites;
-            save();
-            renderAll();
-        };
+        // Bottom nav
+        document.querySelectorAll('.nav-item').forEach(function(item) {
+            item.onclick = function() {
+                navigateTo(this.dataset.page);
+            };
+        });
 
         document.getElementById("searchBox").oninput = function() {
             state.search = this.value;
@@ -2267,7 +2415,7 @@
         // ============================================================
 
         load();
-        renderAll();
+        navigateTo('home');
         console.log("🏕️ Explorer Badge Tracker loaded!");
         console.log("📊 " + Object.keys(BADGES).length + " badges loaded.");
         console.log("⭐ " + state.favourites.length + " favourites");
