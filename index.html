@@ -28,15 +28,38 @@
         }
         .header-top {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
         }
         .header-top h1 {
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            text-align: center;
-            width: 100%;
+        }
+        .header-top .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .header-top .header-actions button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .header-top .header-actions button:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .header-top .header-actions .fav-count {
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 500;
         }
 
         .search-wrap {
@@ -93,6 +116,7 @@
             cursor: pointer;
             transition: all 0.15s;
             border: 1px solid rgba(0, 0, 0, 0.02);
+            position: relative;
         }
         .list-item:active {
             transform: scale(0.98);
@@ -181,6 +205,17 @@
             transition: width 0.3s;
             width: 0%;
         }
+        .list-item .fav-star {
+            font-size: 16px;
+            opacity: 0.3;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 4px;
+        }
+        .list-item .fav-star.active {
+            opacity: 1;
+            color: #f5a623;
+        }
 
         .empty {
             text-align: center;
@@ -193,172 +228,151 @@
             margin-bottom: 12px;
         }
 
-        /* ===== MODAL ===== */
+        /* ===== FULL SCREEN MODAL ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 200;
             display: none;
-            align-items: flex-end;
+            align-items: flex-start;
             justify-content: center;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 0;
         }
         .modal-overlay.show {
             display: flex;
         }
+
         .modal {
             background: white;
             width: 100%;
             max-width: 500px;
-            max-height: 92vh;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 20px 30px;
+            height: 100vh;
+            max-height: 100vh;
+            padding: 0;
             overflow-y: auto;
-            animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            animation: fadeIn 0.3s ease;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
         }
-        @keyframes slideUp {
+
+        @keyframes fadeIn {
             from {
-                transform: translateY(60px);
                 opacity: 0;
+                transform: translateY(10px);
             }
             to {
-                transform: translateY(0);
                 opacity: 1;
+                transform: translateY(0);
             }
         }
-        .modal-handle {
-            width: 40px;
-            height: 4px;
-            background: #ddd;
-            border-radius: 2px;
-            margin: 0 auto 16px;
-        }
 
-        .modal .head {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #f0f0f5;
+        /* Modal Header */
+        .modal-header {
+            background: linear-gradient(135deg, #2d1b69 0%, #4a2c8a 100%);
+            color: white;
+            padding: 16px 20px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            flex-shrink: 0;
         }
-        .modal .head .icon {
-            font-size: 44px;
-            width: 56px;
-            height: 56px;
-            background: #f5f3ff;
-            border-radius: 14px;
+        .modal-header .modal-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header .modal-top-row .modal-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-header .modal-top-row .modal-close:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .modal-header .modal-top-row .modal-fav-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 4px 8px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .modal-header .modal-top-row .modal-fav-btn.active {
+            color: #f5a623;
+        }
+        .modal-header .modal-top-row .modal-fav-btn:active {
+            transform: scale(0.85);
+        }
+        .modal-header .modal-badge-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .modal-header .modal-badge-info .big-icon {
+            font-size: 56px;
+            width: 72px;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
-        .modal .head .info {
-            flex: 1;
-        }
-        .modal .head .info h2 {
-            font-size: 20px;
+        .modal-header .modal-badge-info .title-group h2 {
+            font-size: 22px;
             font-weight: 700;
-            color: #1a1a2e;
             line-height: 1.2;
         }
-        .modal .head .info .cat {
+        .modal-header .modal-badge-info .title-group .cat-label {
             font-size: 13px;
-            color: #888;
-            font-weight: 500;
+            opacity: 0.7;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-        .modal .head .info .progress-text {
-            font-size: 14px;
-            color: #4a2c8a;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-        .modal .close-btn {
-            margin-left: auto;
-            background: #f5f5f5;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal .close-btn:active {
-            background: #e8e8e8;
+            font-weight: 500;
         }
 
-        .modal .requirements-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 12px;
-        }
-        .modal ul {
-            list-style: none;
-            padding: 0;
-        }
-        .modal ul li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f5f5f8;
-            font-size: 15px;
-            line-height: 1.4;
-            color: #1a1a2e;
-        }
-        .modal ul li:last-child {
-            border-bottom: none;
-        }
-        .modal ul li .num {
-            font-size: 13px;
-            font-weight: 600;
-            color: #aaa;
-            width: 26px;
-            flex-shrink: 0;
-            text-align: right;
-        }
-        .modal ul li input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            flex-shrink: 0;
-            margin-top: 1px;
-            accent-color: #4a2c8a;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .modal ul li .text.done {
-            text-decoration: line-through;
-            color: #bbb;
+        /* Modal Body */
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
         }
 
-        .stage-selector {
+        .modal-body .stage-selector {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 12px 0 16px;
-            padding: 12px 16px;
+            margin-bottom: 16px;
+            padding: 10px 14px;
             background: #f5f3ff;
             border-radius: 12px;
             flex-wrap: wrap;
         }
-        .stage-selector label {
+        .modal-body .stage-selector label {
             font-size: 14px;
             font-weight: 600;
             color: #4a2c8a;
         }
-        .stage-selector select {
+        .modal-body .stage-selector select {
             flex: 1;
             min-width: 80px;
             padding: 8px 12px;
@@ -371,49 +385,104 @@
             outline: none;
             cursor: pointer;
         }
-        .stage-selector select:focus {
+        .modal-body .stage-selector select:focus {
             border-color: #2d1b69;
             box-shadow: 0 0 0 3px rgba(74, 44, 138, 0.2);
         }
-        .stage-selector .stage-progress {
+        .modal-body .stage-selector .stage-progress {
             font-size: 13px;
             color: #4a2c8a;
             font-weight: 600;
             margin-left: auto;
         }
 
-        .modal .footer {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #f0f0f5;
+        .modal-body .requirements-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+        .modal-body ul {
+            list-style: none;
+            padding: 0;
+        }
+        .modal-body ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f5;
+            font-size: 15px;
+            line-height: 1.4;
+            color: #1a1a2e;
+        }
+        .modal-body ul li:last-child {
+            border-bottom: none;
+        }
+        .modal-body ul li .num {
+            font-size: 13px;
+            font-weight: 600;
+            color: #aaa;
+            width: 26px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .modal-body ul li input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            accent-color: #4a2c8a;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .modal-body ul li .text.done {
+            text-decoration: line-through;
+            color: #bbb;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            padding: 16px 20px 24px;
+            border-top: 1px solid #eee;
+            background: white;
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .modal .footer .count {
+        .modal-footer .footer-left .count {
             font-size: 14px;
             color: #4a2c8a;
             font-weight: 600;
         }
-        .modal .footer .reset-btn {
+        .modal-footer .footer-left .progress-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .modal-footer .reset-btn {
             background: none;
             border: none;
             font-size: 14px;
             font-weight: 600;
             color: #e74c3c;
             cursor: pointer;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 8px;
+            transition: background 0.2s;
         }
-        .modal .footer .reset-btn:active {
+        .modal-footer .reset-btn:active {
             background: #fef0ef;
         }
 
         @media (min-width: 600px) {
             .modal {
-                border-radius: 20px;
+                max-width: 500px;
+                height: 90vh;
+                max-height: 90vh;
+                border-radius: 24px;
                 margin: 20px;
-                max-height: 80vh;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             }
             .modal-overlay {
                 align-items: center;
@@ -427,6 +496,7 @@
                 height: 56px;
             }
         }
+
         .modal::-webkit-scrollbar {
             width: 4px;
         }
@@ -437,13 +507,41 @@
             background: #ddd;
             border-radius: 4px;
         }
+
+        /* Favourites filter indicator */
+        .filter-favs {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f5a623;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-favs:active {
+            transform: scale(0.95);
+        }
+        .filter-favs.active {
+            background: #2d1b69;
+        }
+        .filter-favs .star {
+            margin-right: 4px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="header-top">
-            <h1>🏕️ Explorer Badge Tracker</h1>
+            <h1>🏕️ Explorer Tracker</h1>
+            <div class="header-actions">
+                <span class="fav-count" id="favCount">⭐ 0</span>
+                <button id="filterFavsBtn" class="filter-favs" title="Show only favourites">
+                    <span class="star">⭐</span> Favourites
+                </button>
+            </div>
         </div>
     </div>
 
@@ -453,27 +551,36 @@
 
     <div id="badgeContainer"></div>
 
+    <!-- ===== FULL SCREEN MODAL ===== -->
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-handle"></div>
-            <div class="head">
-                <div class="icon" id="modalIcon">🏅</div>
-                <div class="info">
-                    <h2 id="modalTitle">Badge Name</h2>
-                    <div class="cat" id="modalCategory">Category</div>
-                    <div class="progress-text" id="modalProgress">0 / 0 complete</div>
+        <div class="modal" id="modalContent">
+            <div class="modal-header">
+                <div class="modal-top-row">
+                    <button class="modal-close" id="modalClose">✕</button>
+                    <button class="modal-fav-btn" id="modalFavBtn">☆</button>
                 </div>
-                <button class="close-btn" id="modalClose">✕</button>
+                <div class="modal-badge-info">
+                    <div class="big-icon" id="modalIcon">🏅</div>
+                    <div class="title-group">
+                        <h2 id="modalTitle">Badge Name</h2>
+                        <div class="cat-label" id="modalCategory">Category</div>
+                    </div>
+                </div>
             </div>
-            <div class="stage-selector" id="stageSelector" style="display:none;">
-                <label>Select Stage:</label>
-                <select id="stageSelect"></select>
-                <span class="stage-progress" id="stageProgress">0/0</span>
+            <div class="modal-body" id="modalBody">
+                <div class="stage-selector" id="stageSelector" style="display:none;">
+                    <label>Select Stage:</label>
+                    <select id="stageSelect"></select>
+                    <span class="stage-progress" id="stageProgress">0/0</span>
+                </div>
+                <div class="requirements-title" id="requirementsTitle">Requirements</div>
+                <ul id="modalRequirements"></ul>
             </div>
-            <div class="requirements-title" id="requirementsTitle">Requirements</div>
-            <ul id="modalRequirements"></ul>
-            <div class="footer">
-                <span class="count" id="modalCount">0 / 0</span>
+            <div class="modal-footer">
+                <div class="footer-left">
+                    <div class="count" id="modalCount">0 / 0 complete</div>
+                    <div class="progress-label">Progress</div>
+                </div>
                 <button class="reset-btn" id="modalReset">Reset All</button>
             </div>
         </div>
@@ -481,13 +588,13 @@
 
     <script>
         // ============================================================
-        // DATA — All Explorer Badges (COMPLETE)
+        // DATA — All Explorer Badges
         // ============================================================
 
         var BADGES = {
 
             // =========================================================
-            // ACTIVITY BADGES (33 - removed duplicates of staged badges)
+            // ACTIVITY BADGES (32 - REAL REQUIREMENTS FROM SCOUTS.ORG.UK)
             // =========================================================
 
             "action-sports": {
@@ -495,10 +602,12 @@
                 cat: "activity",
                 emoji: "🏄",
                 reqs: [
-                    "Take part in an action sport for at least 3 sessions",
-                    "Demonstrate improvement in your chosen sport",
-                    "Show understanding of safety equipment",
-                    "Explain the rules and etiquette of your sport"
+                    "Take part in at least one session of an Action Sport of your choice. Ensure that supervision is provided by an appropriately qualified person if your action sport requires one.",
+                    "Discover - Find out how an action sport has changed since it's invention. Look at the technology used and how it's image has changed.",
+                    "Experience - Take part in an action sport. Learn the skills required for the activity, any equipment used, and how to keep yourself safe.",
+                    "Mobilise - Find out about action sport opportunities in your community. What can you do to help a community sports club? Work with them on one of their development targets.",
+                    "Solve - Plan a trip to take part in an action sport of your choice. Think about how you'll get there, what costs are involved and what kit you'll need.",
+                    "Create - Create a new piece of equipment or accessory that can be used for an action sport of your choice."
                 ]
             },
             "activity-plus": {
@@ -506,10 +615,9 @@
                 cat: "activity",
                 emoji: "⭐",
                 reqs: [
-                    "Participate in at least 3 different adventurous activities",
-                    "Explain safety considerations for each activity",
-                    "Show how you've developed skills across multiple activities",
-                    "Help plan or lead an activity session for others"
+                    "Hold your chosen activity badge",
+                    "Agree a target with your leader before going for the Activity Plus badge (can be awarded for any activity badge except: Athletics, Athletics Plus, Community Impact, Hikes Away, Nights Away, and Time on the Water)",
+                    "Show your leader that you have met your target"
                 ]
             },
             "athletics": {
@@ -517,10 +625,11 @@
                 cat: "activity",
                 emoji: "🏃",
                 reqs: [
-                    "Take part in athletics training for 6 weeks",
-                    "Compete in at least 2 athletics events",
-                    "Demonstrate improvement in your discipline",
-                    "Show understanding of rules and scoring"
+                    "Discover - Look into the science behind how athletes improve their speed or strength. Can you put some into practice as a group?",
+                    "Experience - Try out a new athletic discipline, like long jump or shot put, and see how you do. Consider the safety rules and how you could apply these across disciplines.",
+                    "Mobilise - Take part in a community athletics activity, either marshalling or participating. You could have a go at your local park run, or volunteer as a marshal.",
+                    "Solve - Create a plan to beat your personal best in an activity, whether it's running, jumping, or throwing, and track how you improve over time.",
+                    "Create - Organise and run an athletics event for your District, County or Region. You could organise a venue, plan and lead activities and invite other groups to join."
                 ]
             },
             "camper": {
@@ -528,10 +637,12 @@
                 cat: "activity",
                 emoji: "⛺",
                 reqs: [
-                    "Camp for at least 4 nights in different locations",
-                    "Pitch and strike a tent independently",
-                    "Cook a meal on a camp stove or open fire",
-                    "Show campsite safety and leave-no-trace principles"
+                    "Camp outdoors for a total of seven nights across two events or more as an Explorer, including at least three nights as part of this badge.",
+                    "Discover - Investigate how camping equipment has changed in the past 20-40 years. Focus on one area which interests you.",
+                    "Experience - Use three different types of camping stove to cook a meal. Think about which stove works best and explore how to keep yourself, others, and the environment safe.",
+                    "Mobilise - Help your local campsite to plan and implement one way they can be more inclusive and accessible.",
+                    "Solve - Plan, budget and execute a camp. You should include activities, a menu and appropriate risk assessments for your Unit.",
+                    "Create - Design a local campsite directory, campfire songbook or camp recipe book which could be used by anyone in your group."
                 ]
             },
             "caving": {
@@ -539,10 +650,12 @@
                 cat: "activity",
                 emoji: "🕳️",
                 reqs: [
-                    "Take part in at least 2 caving or mine trips",
-                    "Use caving equipment correctly",
-                    "Show understanding of cave safety",
-                    "Learn about cave conservation and geology"
+                    "Take part in at least one caving trip as part of completing this badge. Make sure your trip is supervised by an appropriately qualified person.",
+                    "Discover - Find out how caves are formed. This might be a cave system local to you or a famous cave system. Understand and explain how it was formed.",
+                    "Experience - Take part in a caving trip. It's important to make sure you do it safely, with a properly led group and relevant qualifications or safety permits in place.",
+                    "Mobilise - Find out about our responsibilities when caving. This might include cave conservation, safety systems or access rights to caves.",
+                    "Solve - Learn how to set up a prussik line for vertical caving and have a go at using it. It's a good idea to have someone experienced and qualified check it's right.",
+                    "Create - Create a model cave system showing the reasons that the system formed. It could be based on a cave system that you have visited."
                 ]
             },
             "chef": {
@@ -550,10 +663,11 @@
                 cat: "activity",
                 emoji: "👨‍🍳",
                 reqs: [
-                    "Plan and cook at least 3 different meals for a group",
-                    "Demonstrate a range of cooking techniques",
-                    "Show understanding of food hygiene and safety",
-                    "Create a balanced meal plan"
+                    "Discover - Choose a recipe, a cooking technique or a traditional food, and find out about its history. Have a go at making something using traditional methods and ingredients.",
+                    "Experience - Hold a cooking competition with your Unit or District.",
+                    "Mobilise - Look at the social issues that surround our food production, and see if you can take any actions to reduce their impact.",
+                    "Solve - Plan a recipe or menu that you would make in your usual kitchen facilities. Then, try and make that using a different cooking facility (e.g. camping stoves or campfire).",
+                    "Create - Create a menu for a specific event. This could be anything from a gala style dinner, or a street food tasting night! Build your budget and shopping list and design the menu."
                 ]
             },
             "climber": {
@@ -561,10 +675,12 @@
                 cat: "activity",
                 emoji: "🧗",
                 reqs: [
-                    "Take part in at least 3 climbing or abseiling sessions",
-                    "Use climbing equipment and knots correctly",
-                    "Show understanding of belaying and safety",
-                    "Learn about climbing ethics"
+                    "Take part in at least two sessions of climbing, indoor or out, while completing this badge. Make sure your session is supervised by an appropriately qualified person.",
+                    "Discover - Find out about the history of Climbing in the UK. Consider how the sport, equipment and access has evolved over the years.",
+                    "Experience - Take part in two different types of climbing and find out about how these climbs are graded and recorded.",
+                    "Mobilise - Consider accessibility within climbing - how it could be more accessible and encourage more people into the sport.",
+                    "Solve - Look at different safety equipment, discover and discuss how we use it and what each item does. Work out why equipment does not work when it's not used properly.",
+                    "Create - Create a guidebook entry for a climb you've done. Consider the information other climbers would need."
                 ]
             },
             "coach": {
@@ -572,10 +688,11 @@
                 cat: "activity",
                 emoji: "📣",
                 reqs: [
-                    "Coach a group in a skill for at least 6 sessions",
-                    "Plan and deliver progressive sessions",
-                    "Give constructive feedback to others",
-                    "Reflect on your coaching and improve"
+                    "Discover - Learn about different coaching techniques, like how to break down skills or keep a group motivated. Demonstrate these to your Unit.",
+                    "Experience - Run a session to coach a group in a new skill that will help them work towards or achieve the badge that you're supporting. Evaluate how you've instructed afterwards.",
+                    "Mobilise - Plan, organise and deliver a workshop to a group outside of your Unit. This could be a different section, or a Unit elsewhere in your area.",
+                    "Solve - Come up with a creative way to explain a tricky concept, like using props or games to make it easier to understand. Test them out on a group.",
+                    "Create - Design a session plan or tip sheet describing how you would teach or instruct a specific skill or activity. Test out your plan to see if it helps others learn."
                 ]
             },
             "communication": {
@@ -583,10 +700,11 @@
                 cat: "activity",
                 emoji: "📢",
                 reqs: [
-                    "Plan and deliver a presentation to a group",
-                    "Use different communication methods",
-                    "Show effective listening and feedback skills",
-                    "Create communication for a specific audience"
+                    "Discover - Find out about digital footprints. Research yourself online and find out what information someone could find out about you if they tried.",
+                    "Experience - Learn a new way of communicating. Learn some phrases and words in either a new language, sign language or by exploring non-verbal ways of communicating.",
+                    "Mobilise - Look at how charities talk about Mental Health. Create and share a way to encourage open conversations about feelings.",
+                    "Solve - Research the issues around social media and digital communication. Think about the pros and cons of different platforms.",
+                    "Create - Create a method of communicating. Think big – this could be from building a machine to help communicate, or designing a method of communication to help in one of your activities."
                 ]
             },
             "content-creation": {
@@ -594,10 +712,11 @@
                 cat: "activity",
                 emoji: "🎬",
                 reqs: [
-                    "Create at least 3 pieces of digital content",
-                    "Plan and storyboard your content",
-                    "Show awareness of online safety and copyright",
-                    "Get feedback and improve your content"
+                    "Discover - Explore how digital content can shape opinions, build communities, and influence change. Learn about ethical storytelling and audience responsibility.",
+                    "Experience - Create a piece of content that aims to positively influence your community or raise awareness of an issue.",
+                    "Mobilise - Collaborate with your District or County to design a digital campaign that supports recruitment or community engagement.",
+                    "Solve - Investigate how to make digital content inclusive and accessible, then teach others what you've learned.",
+                    "Create - Develop a digital storytelling project that includes diverse voices and perspectives from across Scouting."
                 ]
             },
             "creative-arts": {
@@ -605,10 +724,11 @@
                 cat: "activity",
                 emoji: "🎨",
                 reqs: [
-                    "Take part in at least 3 creative arts activities",
-                    "Produce a piece of creative work",
-                    "Show understanding of creative techniques",
-                    "Share or perform your work for others"
+                    "Discover - Find out about an artist, craftsperson or arts organisation and their work. What or who inspired them? How did they get started?",
+                    "Experience - Learn a new creative skill. This could cover art, performing arts, dance, photography or music.",
+                    "Mobilise - Find out what opportunities there are around your local area for you or your Unit to get involved in the Arts.",
+                    "Solve - Create a piece of art using a non-traditional medium or an innovative way of working.",
+                    "Create - Explore an avenue or medium of your choice and create a piece of work that reflects you as a person."
                 ]
             },
             "democracy": {
@@ -616,10 +736,11 @@
                 cat: "activity",
                 emoji: "🗳️",
                 reqs: [
-                    "Learn how democracy works in your country",
-                    "Take part in a democratic process",
-                    "Show understanding of government roles",
-                    "Discuss a current issue and consider different views"
+                    "Discover - Explore the history of democracy in your country. This could include how it works, people's rights, who could vote, and how people have influenced decisions.",
+                    "Experience - Attend, take part in, or meet representatives from a local youth voice or democratic forum.",
+                    "Mobilise - Gather evidence from other young people about a local issue and how it could be addressed, then share your findings with a local decision-maker.",
+                    "Solve - Develop a way to improve how young people's voices are heard on issues that affect them.",
+                    "Create - Design a simple way to help others understand democracy. This could include how people can take part and why participation matters."
                 ]
             },
             "employability-skills": {
@@ -627,10 +748,11 @@
                 cat: "activity",
                 emoji: "💼",
                 reqs: [
-                    "Create or update a CV or portfolio",
-                    "Take part in a mock interview",
-                    "Show understanding of workplace skills",
-                    "Identify your strengths and areas for development"
+                    "Discover - Research the transferrable soft skills that Employers look for. Identify how your time in Explorers may contribute to these skills.",
+                    "Experience - Build some mock interviews for another person in your Unit. Have a go at both interviewing and being interviewed.",
+                    "Mobilise - Get in touch with some local employers and businesses in your area, and ask them to run some employability sessions.",
+                    "Solve - Set up some scenarios or simulations of conflicts you may face and implement some conflict resolution skills.",
+                    "Create - Create your CV through a medium not usually seen in job applications. This could be a fun video, a presentation, or a song."
                 ]
             },
             "exploration": {
@@ -638,10 +760,11 @@
                 cat: "activity",
                 emoji: "🗺️",
                 reqs: [
-                    "Plan and complete an exploration (2+ days)",
-                    "Use navigation skills to find your way",
-                    "Keep a record of your exploration",
-                    "Reflect on what you learned"
+                    "Discover - Investigate the life and impact of an explorer. Choose a historical or contemporary explorer and research their journey and impact.",
+                    "Experience - Navigate and document an unfamiliar area. Create a detailed field journal or digital map that includes observations of natural features and local culture.",
+                    "Mobilise - Advocate for access to outdoor spaces. Research Public Rights of Way in your area and investigate any current issues or campaigns.",
+                    "Solve - Design a detailed plan for an expedition to a remote or hard-to-reach location. Include transport, safety, equipment, budgeting, and team roles.",
+                    "Create - While out exploring an area, gather meaningful items, images, or sounds. Use them to produce something that communicates your experience."
                 ]
             },
             "fundraising": {
@@ -649,10 +772,11 @@
                 cat: "activity",
                 emoji: "💰",
                 reqs: [
-                    "Plan and run a fundraising event",
-                    "Raise at least £100 for a cause",
-                    "Show understanding of the cause",
-                    "Promote your fundraising to others"
+                    "Discover - Research a charity of your choice to find out how they go about fundraising. This could be a global charity or a smaller local charity.",
+                    "Experience - Spend a few hours assisting a local charity, experiencing first-hand the impact of their work and what funds support.",
+                    "Mobilise - Organise, plan, budget and execute a fundraising initiative such as a coffee morning, trivia night or sponsored event.",
+                    "Solve - Consider the issues faced by Charities. Would a global charity have the same problems and dilemmas as a local one?",
+                    "Create - Make and sell simple handmade items like bracelets, cards, or baked goods, with proceeds going to charity."
                 ]
             },
             "global-issues": {
@@ -660,10 +784,11 @@
                 cat: "activity",
                 emoji: "🌍",
                 reqs: [
-                    "Research a global issue",
-                    "Show understanding of different perspectives",
-                    "Take action to raise awareness",
-                    "Reflect on your own role in global issues"
+                    "Discover - Interview someone from a different country or background about a global issue that affects their community.",
+                    "Experience - Volunteer at a local organisation that supports people affected by global issues, such as poverty, displacement, or climate change.",
+                    "Mobilise - Organise a film screening or discussion event about a global issue you care about.",
+                    "Solve - Design and run a community workshop that teaches a practical skill linked to solving a global issue.",
+                    "Create - Develop a digital resource like a podcast episode, infographic, or short video about a global issue."
                 ]
             },
             "hill-walker": {
@@ -671,10 +796,12 @@
                 cat: "activity",
                 emoji: "🏔️",
                 reqs: [
-                    "Take part in at least 3 hill or mountain walks",
-                    "Navigate in upland terrain",
-                    "Show understanding of weather and mountain safety",
-                    "Learn about the countryside code"
+                    "Take part in at least two journeys in terrain 2 areas. An appropriately qualified person must accompany or supervise the journeys.",
+                    "Discover - Research how to prepare for a multi-day hillwalking expedition in terrain one or two.",
+                    "Experience - Take part in a hill walk in terrain one or two, contributing to navigation, pacing, and group decision-making.",
+                    "Mobilise - Join a conservation or access-focused activity during a hill or mountain day.",
+                    "Solve - Create and act out realistic emergency scenarios in a hill environment, using appropriate equipment and techniques.",
+                    "Create - Create a detailed walk plan and terrain model for a challenging hill walk, using either digital or physical materials."
                 ]
             },
             "hobbies": {
@@ -682,10 +809,11 @@
                 cat: "activity",
                 emoji: "🎯",
                 reqs: [
-                    "Take up a hobby for at least 3 months",
-                    "Demonstrate improvement in your hobby",
-                    "Show understanding of your hobby's history",
-                    "Share your hobby with others"
+                    "Discover - Explore how hobbies help people define who they are. Meet some people of different ages and ask them about how their hobbies have shaped their identity.",
+                    "Experience - Explore how your hobby is portrayed in media, advertising, or pop culture.",
+                    "Mobilise - Support someone who's new to your hobby by helping them get started and stay motivated.",
+                    "Solve - Set yourself a goal within your hobby that requires persistence and problem-solving.",
+                    "Create - Team up with others to create something that blends your hobbies together."
                 ]
             },
             "leadership": {
@@ -693,10 +821,11 @@
                 cat: "activity",
                 emoji: "👑",
                 reqs: [
-                    "Lead a team on at least 3 occasions",
-                    "Demonstrate different leadership styles",
-                    "Delegate and motivate others effectively",
-                    "Reflect on your leadership and improve"
+                    "Discover - Learn about the different types of Leadership style. Take part in a quiz to find out what your leadership style is.",
+                    "Experience - Take an active role in leading a camp, event, project or session. Ask your fellow Explorers to evaluate your leadership style.",
+                    "Mobilise - Lead a charity campaign or activity. Build a team of people to support you, and plan how you will carry out the activity.",
+                    "Solve - Visit an escape room, and assign different members of the team different leadership roles for different parts of the activity.",
+                    "Create - Design a leadership workshop on how to be an effective leader."
                 ]
             },
             "life-skills": {
@@ -704,10 +833,11 @@
                 cat: "activity",
                 emoji: "🧠",
                 reqs: [
-                    "Demonstrate 3 practical life skills",
-                    "Show understanding of personal finance",
-                    "Demonstrate skills for independent living",
-                    "Plan for a future life goal"
+                    "Discover - Find out how to properly wash, dry, and care for different types of clothing, including reading care labels and choosing the right settings.",
+                    "Experience - Carry out simple home maintenance by assembling flat‑pack furniture or equipment, following written or visual instructions.",
+                    "Mobilise - Take part in a group discussion or debate and practise active listening and clear speaking.",
+                    "Solve - Plan how to get somewhere using only public transport. What are your different options, how much will it cost and how long will the journey take?",
+                    "Create - Design a personal budget for a month, including income, savings, and essential expenses."
                 ]
             },
             "money-skills": {
@@ -715,10 +845,11 @@
                 cat: "activity",
                 emoji: "💰",
                 reqs: [
-                    "Create and manage a budget for 3 months",
-                    "Show understanding of saving and investing",
-                    "Learn about financial products",
-                    "Understand tax and national insurance"
+                    "Discover - Understand how money works and what affects the way we use it. Find out what shapes your spending habits.",
+                    "Experience - Build your money skills by trying activities such as trading, budgeting and finding ways to grow your money.",
+                    "Mobilise - Take action and find out how to help people with money. You could organise a fundraiser or start a local project.",
+                    "Solve - Take on a challenge that'll improve your money skills and help you plan for the future.",
+                    "Create - Get creative and make something that helps others learn about money in a fun way."
                 ]
             },
             "nature": {
@@ -726,10 +857,11 @@
                 cat: "activity",
                 emoji: "🌿",
                 reqs: [
-                    "Take part in 3 nature-based activities",
-                    "Identify at least 20 species",
-                    "Show understanding of ecosystems",
-                    "Take action to help the environment"
+                    "Discover - Choose an area of the natural world, explore the conservation and environmental impact of that area.",
+                    "Experience - Observe the natural world around you. This could be a nature walk identifying plants along your journey.",
+                    "Mobilise - Take a look at how human activity is affecting the natural world. Lead a local activity to support conserving the environment.",
+                    "Solve - Come up with an idea to mitigate human impact on the environment and enable humans and nature to coexist more effectively.",
+                    "Create - Design and assemble multiple wildlife structures that work together to improve the biodiversity of a chosen outdoor space."
                 ]
             },
             "performing-arts": {
@@ -737,10 +869,11 @@
                 cat: "activity",
                 emoji: "🎭",
                 reqs: [
-                    "Take part in 3 performing arts activities",
-                    "Perform in front of an audience twice",
-                    "Show understanding of performance techniques",
-                    "Contribute to a performance production"
+                    "Discover - Research the job roles that exist in the theatre. Spend some time finding out the details involved in working in one of these roles.",
+                    "Experience - Get a feeling for the excitement of performance by learning and playing a selection of improvisation games and acting techniques.",
+                    "Mobilise - Plan and perform a coordinated flash mob, combining drama, dance, or music to surprise and engage.",
+                    "Solve - Research, design and create a prop/props for a performance of a well-known play using only limited materials.",
+                    "Create - Write, rehearse, create props for and perform a short play with your Unit."
                 ]
             },
             "personal-safety": {
@@ -748,10 +881,11 @@
                 cat: "activity",
                 emoji: "🛡️",
                 reqs: [
-                    "Show personal safety in different situations",
-                    "Learn about risk assessment",
-                    "Stay safe online and offline",
-                    "Create a personal safety plan"
+                    "Discover - Compare how teenagers and adults think about risk and safety in everyday situations.",
+                    "Experience - Show how to manage risk for an activity or event that young people take part in.",
+                    "Mobilise - Meet or shadow frontline workers like youth workers, paramedics, police officers, or rail staff to learn about real safety issues.",
+                    "Solve - Learn and practise decision-making tools like exit plans, refusal skills, and knowing when to ask for help.",
+                    "Create - Design a toolkit to help other young people manage risk and stay safe in real-life and online situations."
                 ]
             },
             "pioneering": {
@@ -759,10 +893,12 @@
                 cat: "activity",
                 emoji: "🪚",
                 reqs: [
-                    "Build 3 pioneering structures",
-                    "Demonstrate lashing and knot-tying skills",
-                    "Show understanding of structural safety",
-                    "Plan and lead a pioneering project"
+                    "Take part in at least one large scale Pioneering project. You should complete your project over the course of a day.",
+                    "Discover - Investigate how pioneering projects or inventions have become essential to modern architecture.",
+                    "Experience - Take part in a pioneering project. This could be a large structure made within a team, or a smaller structure made solo.",
+                    "Mobilise - Research a pioneered structure and lead a team to plan and complete its construction.",
+                    "Solve - Use rubber bands and lolly sticks to create a bridge or a similar project. How much weight can it hold? How could you make it stronger?",
+                    "Create - Design a useful pioneered structure and build it in real life. Include drawings, a scale model, and a guide on how to create it."
                 ]
             },
             "problem-solver": {
@@ -770,10 +906,11 @@
                 cat: "activity",
                 emoji: "🧩",
                 reqs: [
-                    "Solve a complex problem with a structured approach",
-                    "Use 3 different problem-solving techniques",
-                    "Work with others to solve a problem",
-                    "Reflect on your problem-solving process"
+                    "Discover - Identify a real issue affecting your local area, such as housing, transport, youth services, or environmental concerns.",
+                    "Experience - Take part in a complex team-based challenge that requires communication, logic, and creative thinking.",
+                    "Mobilise - Choose a global issue and take meaningful local action to address it.",
+                    "Solve - Participate in a structured problem-solving activity such as a mock trial, ethical debate, or engineering design challenge.",
+                    "Create - Invent a problem-solving activity for others to complete - this could be a logic puzzle, roleplay scenario, or digital challenge."
                 ]
             },
             "stem": {
@@ -781,10 +918,11 @@
                 cat: "activity",
                 emoji: "🔬",
                 reqs: [
-                    "Complete 3 STEM projects or experiments",
-                    "Show understanding of the scientific method",
-                    "Demonstrate a STEM skill",
-                    "Explain a STEM concept to others"
+                    "Discover - Investigate how gas turbines power everyday life. Choose a real-world example and explain how gas turbines are used.",
+                    "Experience - Take a closer look at an engine and learn how to care for it.",
+                    "Mobilise - Visit or start a community project that repairs or upcycles broken items.",
+                    "Solve - Work out how much energy a campsite would need for one night and plan how to supply it.",
+                    "Create - Build a camp gadget that is powered by renewable energy."
                 ]
             },
             "space": {
@@ -792,10 +930,11 @@
                 cat: "activity",
                 emoji: "🚀",
                 reqs: [
-                    "Learn about space exploration and astronomy",
-                    "Observe the night sky with a telescope",
-                    "Build a space-related model or device",
-                    "Explain a space concept"
+                    "Discover - Explore first-hand accounts from people who have been involved in the space industry or witnessed its impact.",
+                    "Experience - Grow a plant without using soil. Find out how things are grown in space and why we might need to.",
+                    "Mobilise - Find out about light pollution and how this can affect our exploration of space.",
+                    "Solve - Find out about satellites and space rovers, you could practice controlling something from a distance and learn why this is useful.",
+                    "Create - Using a medium of your choice showcase something about space that interests you."
                 ]
             },
             "sports-and-fitness": {
@@ -803,10 +942,11 @@
                 cat: "activity",
                 emoji: "🏋️",
                 reqs: [
-                    "Train regularly for at least 6 weeks",
-                    "Demonstrate improvement in fitness",
-                    "Show understanding of nutrition",
-                    "Set and work towards a fitness goal"
+                    "Discover - Choose three sports that interest you and research them. What training regimes do they have? What's different about them, and what's similar?",
+                    "Experience - Take part in a new sport. Try some of the techniques and exercises from the sport.",
+                    "Mobilise - Teach a sport of your choice to a group. Think about how you can communicate the benefits of the sport.",
+                    "Solve - Choose a sport that interests you and find out if the equipment can be made either more environmentally friendly, or more accessible.",
+                    "Create - Come up with a new sport, design what it looks like, how you play, and teach another group/section it."
                 ]
             },
             "survival-skills": {
@@ -814,10 +954,11 @@
                 cat: "activity",
                 emoji: "🔥",
                 reqs: [
-                    "Build a shelter from natural materials",
-                    "Light a fire without matches",
-                    "Find and purify water",
-                    "Demonstrate signalling and rescue techniques"
+                    "Discover - Research and demonstrate different methods of building and lighting fires in outdoor environments, including their advantages and risks.",
+                    "Experience - Take part in a survival camp or outdoor challenge where you build your own shelter, cook over fire, and carry essential gear.",
+                    "Mobilise - Connect with organisations that help people prepare for or respond to emergencies and find some way to support them.",
+                    "Solve - Act out a realistic survival situation, such as getting lost while hiking or being stranded after a storm.",
+                    "Create - Research and build a survival kit tailored to a particular environment or emergency."
                 ]
             },
             "teamwork": {
@@ -825,10 +966,11 @@
                 cat: "activity",
                 emoji: "🤝",
                 reqs: [
-                    "Work as part of a team on 3 different projects",
-                    "Show understanding of team roles",
-                    "Give and receive feedback",
-                    "Reflect on team performance"
+                    "Discover - Find out about a local team which is working in your community or local Scouting area.",
+                    "Experience - Spend a day working as part of a well-established team and find out about the important roles within their team.",
+                    "Mobilise - Form a team with some people from another Unit in your local area and work to achieve a task locally.",
+                    "Solve - Run three different team building activities. After running them, discuss any challenges you had with your group.",
+                    "Create - Produce a team-led presentation or demonstration, that teaches others a skill activity or idea."
                 ]
             },
             "try-new-things": {
@@ -836,12 +978,11 @@
                 cat: "activity",
                 emoji: "🌟",
                 reqs: [
-                    "Complete 3 activities from the list below",
-                    "Discover: Explore why stepping outside your comfort zone matters for personal growth, innovation, and resilience. Share stories of when you or others took a risk.",
-                    "Experience: Pair up with someone who has a different skill or interest, and teach each other something new.",
-                    "Mobilise: Work with a younger section to design and run an activity that encourages them to try something new.",
-                    "Solve: Design a relay or challenge where each stage requires the group to adapt to a new rule, tool, or environment.",
-                    "Create: Develop a resource, event, or story that inspires others to embrace new experiences."
+                    "Discover - Explore why stepping outside your comfort zone matters for personal growth, innovation, and resilience.",
+                    "Experience - Pair up with someone who has a different skill or interest, and teach each other something new.",
+                    "Mobilise - Work with a younger section or different youth group to design and run an activity that encourages them to try something new.",
+                    "Solve - Design a relay or challenge where each stage requires the group to adapt to a new rule, tool, or environment.",
+                    "Create - Develop a resource, event, or story that inspires others to embrace new experiences and thrive in uncertainty."
                 ]
             },
             "water-activities": {
@@ -849,19 +990,17 @@
                 cat: "activity",
                 emoji: "💧",
                 reqs: [
-                    "Take part in at least two activities that take place on or in the water while earning this badge",
-                    "The activity should be supervised by an appropriately qualified person",
-                    "Complete 3 Activities from the list below",
-                    "Discover: Find out about the history of a water activity, or an inspirational person who takes part in water activities.",
-                    "Experience: Plan a 2-3 hour journey for a chosen water activity, then carry it out with an appropriately qualified person.",
-                    "Mobilise: Learn about water quality issues and take part in an activity to support the work they do.",
-                    "Solve: Practice some rescue techniques and find out how to keep each other safe in water activities.",
-                    "Create: Design a craft or equipment you might use in water activities."
+                    "Take part in at least two activities that take place on or in the water while earning this badge. The activity should be supervised by an appropriately qualified person.",
+                    "Discover - Find out about the history of a water activity, or an inspirational person who takes part in water activities.",
+                    "Experience - Plan a 2-3 hour journey for a chosen water activity, then carry it out with an appropriately qualified person.",
+                    "Mobilise - Learn about water quality issues. Find out about a campaign near you and take part in an activity to support the work they do.",
+                    "Solve - Think about what could happen if things go wrong. Practice some rescue techniques and find out how to keep each other safe.",
+                    "Create - Design a craft or equipment you might use in water activities. You could even build your craft and try it out on some water!"
                 ]
             },
 
             // =========================================================
-            // STAGED BADGES (15 - all with stage selector)
+            // STAGED BADGES (15)
             // =========================================================
 
             "staged-air-activities": {
@@ -1675,7 +1814,9 @@
             done: {},
             search: "",
             current: null,
-            currentStage: "1"
+            currentStage: "1",
+            favourites: [],
+            showFavourites: false
         };
 
         function load() {
@@ -1685,6 +1826,8 @@
                     var parsed = JSON.parse(saved);
                     state.done = parsed.done || {};
                     state.currentStage = parsed.currentStage || "1";
+                    state.favourites = parsed.favourites || [];
+                    state.showFavourites = parsed.showFavourites || false;
                 }
             } catch (e) {}
         }
@@ -1693,9 +1836,51 @@
             try {
                 localStorage.setItem("explorerTracker", JSON.stringify({
                     done: state.done,
-                    currentStage: state.currentStage
+                    currentStage: state.currentStage,
+                    favourites: state.favourites,
+                    showFavourites: state.showFavourites
                 }));
             } catch (e) {}
+        }
+
+        // ============================================================
+        // FAVOURITES
+        // ============================================================
+
+        function isFavourite(id) {
+            return state.favourites.indexOf(id) !== -1;
+        }
+
+        function toggleFavourite(id) {
+            var index = state.favourites.indexOf(id);
+            if (index === -1) {
+                state.favourites.push(id);
+            } else {
+                state.favourites.splice(index, 1);
+            }
+            save();
+            renderAll();
+            updateFavButtonUI(id);
+        }
+
+        function updateFavButtonUI(id) {
+            var fav = isFavourite(id);
+            var btn = document.getElementById("modalFavBtn");
+            if (btn) {
+                btn.textContent = fav ? "★" : "☆";
+                btn.className = "modal-fav-btn" + (fav ? " active" : "");
+            }
+            // Also update the star on the list item if it's visible
+            var star = document.querySelector('.list-item[data-id="' + id + '"] .fav-star');
+            if (star) {
+                star.textContent = fav ? "★" : "☆";
+                star.className = "fav-star" + (fav ? " active" : "");
+            }
+            updateFavCount();
+        }
+
+        function updateFavCount() {
+            document.getElementById("favCount").textContent = "⭐ " + state.favourites.length;
         }
 
         // ============================================================
@@ -1744,6 +1929,14 @@
 
         function getFiltered() {
             var ids = Object.keys(BADGES);
+
+            // Filter by favourites if enabled
+            if (state.showFavourites) {
+                ids = ids.filter(function(id) {
+                    return state.favourites.indexOf(id) !== -1;
+                });
+            }
+
             if (state.search.trim()) {
                 var q = state.search.toLowerCase().trim();
                 ids = ids.filter(function(id) {
@@ -1766,6 +1959,16 @@
 
         function renderAll() {
             renderList();
+            updateFavCount();
+            updateFilterButtonUI();
+        }
+
+        function updateFilterButtonUI() {
+            var btn = document.getElementById("filterFavsBtn");
+            if (btn) {
+                btn.className = "filter-favs" + (state.showFavourites ? " active" : "");
+                btn.innerHTML = state.showFavourites ? '⭐ Showing Favourites' : '⭐ Favourites';
+            }
         }
 
         function renderList() {
@@ -1773,8 +1976,11 @@
             var allIds = getFiltered();
 
             if (allIds.length === 0) {
+                var msg = state.showFavourites ? 'No favourites yet. Tap the star on any badge to add it!' :
+                    'No badges found matching your search.';
                 container.innerHTML =
-                    '<div class="empty"><span class="big">🔍</span><p>No badges found matching your search.</p></div>';
+                    '<div class="empty"><span class="big">' + (state.showFavourites ? '⭐' : '🔍') +
+                    '</span><p>' + msg + '</p></div>';
                 return;
             }
 
@@ -1801,8 +2007,9 @@
                     var b = BADGES[id];
                     var p = getProgress(id);
                     var done = p.pct === 100 && p.total > 0;
+                    var fav = isFavourite(id);
 
-                    html += '<div class="list-item" onclick="openModal(\'' + id + '\')">';
+                    html += '<div class="list-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
                     html += '<div class="icon">' + b.emoji + '</div>';
                     html += '<div class="info">';
                     html += '<div class="name">' + b.name + '</div>';
@@ -1813,6 +2020,8 @@
                     html += '</div>';
                     html += '<div class="progress-bar-mini"><div class="fill" style="width:' + p.pct + '%"></div></div>';
                     html += '<div class="check' + (done ? ' done' : '') + '">✓</div>';
+                    html += '<span class="fav-star' + (fav ? ' active' : '') + '" onclick="event.stopPropagation(); toggleFavourite(\'' +
+                        id + '\');">' + (fav ? '★' : '☆') + '</span>';
                     html += '</div>';
                 }
 
@@ -1836,6 +2045,9 @@
             var catMap = { activity: "Activity Badge", staged: "Staged Badge", challenge: "Challenge Award",
                 top: "Top Award" };
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
+
+            // Update favourite button
+            updateFavButtonUI(id);
 
             var stageSelector = document.getElementById("stageSelector");
             var requirementsTitle = document.getElementById("requirementsTitle");
@@ -1868,16 +2080,14 @@
 
                 var sp = getStageProgress(id, state.currentStage);
                 document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
-                document.getElementById("modalProgress").textContent = "Stage " + state.currentStage + " progress";
-                document.getElementById("modalCount").textContent = sp.done + " / " + sp.total;
+                document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
 
                 select.onchange = function() {
                     state.currentStage = this.value;
                     renderStageRequirements(id, state.currentStage);
                     var sp2 = getStageProgress(id, state.currentStage);
                     document.getElementById("stageProgress").textContent = sp2.done + "/" + sp2.total;
-                    document.getElementById("modalProgress").textContent = "Stage " + state.currentStage + " progress";
-                    document.getElementById("modalCount").textContent = sp2.done + " / " + sp2.total;
+                    document.getElementById("modalCount").textContent = sp2.done + " / " + sp2.total + " complete";
                     save();
                 };
 
@@ -1900,11 +2110,11 @@
                 list.innerHTML = html;
 
                 var p = getProgress(id);
-                document.getElementById("modalProgress").textContent = p.done + " / " + p.total + " complete";
-                document.getElementById("modalCount").textContent = p.done + " / " + p.total;
+                document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
             }
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
+            document.body.style.overflow = "hidden";
         }
 
         function renderStageRequirements(id, stageKey) {
@@ -1932,6 +2142,7 @@
 
         function closeModal() {
             document.getElementById("modalOverlay").className = "modal-overlay";
+            document.body.style.overflow = "";
             state.current = null;
         }
 
@@ -1941,8 +2152,7 @@
             save();
 
             var p = getProgress(id);
-            document.getElementById("modalProgress").textContent = p.done + " / " + p.total + " complete";
-            document.getElementById("modalCount").textContent = p.done + " / " + p.total;
+            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
             var items = document.querySelectorAll("#modalRequirements li");
             if (items[index]) {
@@ -1964,8 +2174,7 @@
 
             var sp = getStageProgress(id, stageKey);
             document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
-            document.getElementById("modalProgress").textContent = "Stage " + stageKey + " progress";
-            document.getElementById("modalCount").textContent = sp.done + " / " + sp.total;
+            document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
 
             var items = document.querySelectorAll("#modalRequirements li");
             if (items[index]) {
@@ -1999,15 +2208,13 @@
                 renderStageRequirements(id, state.currentStage);
                 var sp = getStageProgress(id, state.currentStage);
                 document.getElementById("stageProgress").textContent = sp.done + "/" + sp.total;
-                document.getElementById("modalProgress").textContent = "Stage " + state.currentStage + " progress";
-                document.getElementById("modalCount").textContent = sp.done + " / " + sp.total;
+                document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
             } else {
                 for (var i = 0; i < b.reqs.length; i++) {
                     delete state.done[id + "-" + i];
                 }
                 var p = getProgress(id);
-                document.getElementById("modalProgress").textContent = p.done + " / " + p.total + " complete";
-                document.getElementById("modalCount").textContent = p.done + " / " + p.total;
+                document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
                 var items = document.querySelectorAll("#modalRequirements li");
                 for (var j = 0; j < items.length; j++) {
@@ -2032,6 +2239,20 @@
         };
         document.getElementById("modalReset").onclick = resetBadge;
 
+        document.getElementById("modalFavBtn").onclick = function() {
+            if (state.current) {
+                toggleFavourite(state.current);
+                // Update the button in the modal
+                updateFavButtonUI(state.current);
+            }
+        };
+
+        document.getElementById("filterFavsBtn").onclick = function() {
+            state.showFavourites = !state.showFavourites;
+            save();
+            renderAll();
+        };
+
         document.getElementById("searchBox").oninput = function() {
             state.search = this.value;
             renderAll();
@@ -2049,6 +2270,7 @@
         renderAll();
         console.log("🏕️ Explorer Badge Tracker loaded!");
         console.log("📊 " + Object.keys(BADGES).length + " badges loaded.");
+        console.log("⭐ " + state.favourites.length + " favourites");
     </script>
 </body>
 </html>
