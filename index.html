@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Explorer Badge Tracker</title>
     <style>
-        /* ===== RESET & BASE ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,69 +12,73 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f5f5f5;
+            background: #f0f2f5;
             color: #1a1a1a;
             padding-bottom: 80px;
         }
-
-        /* ===== HEADER ===== */
-        .app-header {
+        .header {
             background: #0a3d62;
             color: white;
             padding: 16px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .app-header h1 {
+        .header h1 {
             font-size: 20px;
-            font-weight: 600;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
-        .app-header .badge-count {
+        .header .count {
             background: rgba(255,255,255,0.2);
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 14px;
         }
-
-        /* ===== PROGRESS BAR ===== */
-        .progress-section {
+        .progress-box {
             background: white;
-            padding: 16px 20px;
             margin: 12px 16px;
+            padding: 16px 20px;
             border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
         }
-        .progress-section .label {
+        .progress-box .label {
             font-size: 14px;
             color: #666;
-            margin-bottom: 4px;
         }
-        .progress-section .percentage {
+        .progress-box .percent {
             font-size: 28px;
             font-weight: 700;
             color: #0a3d62;
         }
-        .progress-bar {
+        .bar {
             height: 8px;
             background: #e0e0e0;
             border-radius: 4px;
             margin-top: 8px;
             overflow: hidden;
         }
-        .progress-bar .fill {
+        .bar .fill {
             height: 100%;
             background: #0a3d62;
             border-radius: 4px;
-            transition: width 0.3s ease;
+            transition: width 0.3s;
             width: 0%;
         }
-
-        /* ===== CATEGORY TABS ===== */
+        .search {
+            margin: 8px 16px 12px;
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            width: calc(100% - 32px);
+            background: white;
+            outline: none;
+        }
+        .search:focus {
+            border-color: #0a3d62;
+        }
         .tabs {
             display: flex;
             gap: 8px;
@@ -85,8 +88,10 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab-btn {
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .tabs button {
             flex: 0 0 auto;
             padding: 8px 16px;
             border: none;
@@ -96,69 +101,65 @@
             font-weight: 500;
             color: #555;
             cursor: pointer;
-            transition: all 0.2s;
             white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
         }
-        .tab-btn.active {
+        .tabs button.active {
             background: #0a3d62;
             color: white;
         }
-        .tab-btn:active { transform: scale(0.96); }
-
-        /* ===== BADGE GRID ===== */
-        .badge-grid {
+        .tabs button:active {
+            transform: scale(0.96);
+        }
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 12px;
             padding: 0 16px;
         }
-
-        /* ===== BADGE CARD ===== */
-        .badge-card {
+        .card {
             background: white;
             border-radius: 12px;
             padding: 14px 12px 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-        }
-        .badge-card:active { transform: scale(0.97); }
-        .badge-card .badge-img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 8px;
-            background: #f0f0f0;
+            min-height: 120px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 700;
-            color: #aaa;
-            margin-bottom: 8px;
-            overflow: hidden;
-            object-fit: cover;
         }
-        .badge-card .badge-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        .card:active {
+            transform: scale(0.96);
         }
-        .badge-card .badge-name {
+        .card .emoji {
+            font-size: 42px;
+            text-align: center;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+        .card .name {
             font-size: 13px;
             font-weight: 600;
             line-height: 1.3;
-            margin-bottom: 2px;
+            text-align: center;
+            /* Fix for -webkit-line-clamp */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 34px;
+            word-break: break-word;
         }
-        .badge-card .badge-progress {
+        .card .progress {
             font-size: 12px;
             color: #888;
+            text-align: center;
+            margin-top: 4px;
         }
-        .badge-card .check-mark {
+        .card .check {
             position: absolute;
             top: 8px;
             right: 8px;
@@ -172,14 +173,25 @@
             justify-content: center;
             font-size: 13px;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, background 0.2s;
         }
-        .badge-card .check-mark.complete {
+        .card .check.done {
             opacity: 1;
             background: #2e7d32;
         }
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            grid-column: 1/-1;
+        }
+        .empty .big {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
 
-        /* ===== DETAIL VIEW (Modal) ===== */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -192,22 +204,30 @@
             align-items: flex-end;
             justify-content: center;
         }
-        .modal-overlay.open { display: flex; }
+        .modal-overlay.show {
+            display: flex;
+        }
         .modal {
             background: white;
             width: 100%;
             max-width: 500px;
             max-height: 90vh;
             border-radius: 20px 20px 0 0;
-            padding: 20px 20px 30px;
+            padding: 20px;
             overflow-y: auto;
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
-        .modal .modal-header {
+        .modal .head {
             display: flex;
             align-items: center;
             gap: 16px;
@@ -215,45 +235,37 @@
             padding-bottom: 12px;
             border-bottom: 1px solid #eee;
         }
-        .modal .modal-header .thumb {
+        .modal .head .icon {
+            font-size: 48px;
             width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
+            text-align: center;
             flex-shrink: 0;
-            overflow: hidden;
         }
-        .modal .modal-header .thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .modal .modal-header .info h2 {
+        .modal .head .info h2 {
             font-size: 18px;
             font-weight: 700;
-            line-height: 1.2;
         }
-        .modal .modal-header .info .cat {
+        .modal .head .info .cat {
             font-size: 13px;
             color: #888;
         }
-        .modal .modal-close {
+        .modal .close {
             margin-left: auto;
             background: none;
             border: none;
             font-size: 24px;
             cursor: pointer;
             padding: 4px 8px;
+            color: #666;
         }
-        .modal .requirements {
+        .modal .close:hover {
+            color: #000;
+        }
+        .modal ul {
             list-style: none;
             padding: 0;
         }
-        .modal .requirements li {
+        .modal ul li {
             display: flex;
             align-items: flex-start;
             gap: 12px;
@@ -262,8 +274,10 @@
             font-size: 15px;
             line-height: 1.4;
         }
-        .modal .requirements li:last-child { border-bottom: none; }
-        .modal .requirements li input[type="checkbox"] {
+        .modal ul li:last-child {
+            border-bottom: none;
+        }
+        .modal ul li input[type="checkbox"] {
             width: 22px;
             height: 22px;
             flex-shrink: 0;
@@ -271,14 +285,11 @@
             accent-color: #0a3d62;
             cursor: pointer;
         }
-        .modal .requirements li .req-text {
-            flex: 1;
-        }
-        .modal .requirements li .req-text.done {
+        .modal ul li .text.done {
             text-decoration: line-through;
             color: #999;
         }
-        .modal .modal-footer {
+        .modal .footer {
             margin-top: 16px;
             padding-top: 12px;
             border-top: 1px solid #eee;
@@ -286,11 +297,11 @@
             justify-content: space-between;
             align-items: center;
         }
-        .modal .modal-footer .count {
+        .modal .footer .count {
             font-size: 14px;
             color: #666;
         }
-        .modal .modal-footer .reset-btn {
+        .modal .footer .reset {
             background: none;
             border: 1px solid #ddd;
             padding: 6px 14px;
@@ -298,268 +309,256 @@
             font-size: 13px;
             color: #888;
             cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .modal .footer .reset:hover {
+            border-color: #999;
+            color: #555;
+        }
+        .modal .footer .reset:active {
+            transform: scale(0.96);
         }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-
-        /* ===== RESPONSIVE TWEAKS ===== */
         @media (min-width: 600px) {
-            .badge-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-            .modal { border-radius: 20px; margin: 20px; max-height: 80vh; }
-            .modal-overlay { align-items: center; }
+            .modal {
+                border-radius: 20px;
+                margin: 20px;
+                max-height: 80vh;
+            }
+            .modal-overlay {
+                align-items: center;
+            }
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
         }
         @media (max-width: 400px) {
-            .badge-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-            .badge-card .badge-name { font-size: 12px; }
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 8px;
+            }
+            .card .name {
+                font-size: 12px;
+            }
+            .card .emoji {
+                font-size: 36px;
+            }
         }
-
-        /* ===== UTILITY ===== */
-        .hidden { display: none !important; }
-        .mt-8 { margin-top: 8px; }
-        .text-center { text-align: center; }
-
-        /* ===== SEARCH ===== */
-        .search-box {
-            margin: 8px 16px 12px;
-            padding: 10px 16px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            width: calc(100% - 32px);
-            background: white;
-            outline: none;
-        }
-        .search-box:focus { border-color: #0a3d62; }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="app-header">
+    <div class="header">
         <h1>
             <span>🏕️ Explorer Tracker</span>
-            <span class="badge-count" id="totalBadgeCount">0</span>
+            <span class="count" id="badgeCount">0</span>
         </h1>
-    </header>
-
-    <!-- ===== PROGRESS ===== -->
-    <section class="progress-section">
-        <div class="label">Overall Progress</div>
-        <div class="percentage" id="progressPercent">0%</div>
-        <div class="progress-bar">
-            <div class="fill" id="progressFill"></div>
-        </div>
-    </section>
-
-    <!-- ===== SEARCH ===== -->
-    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search badges..." />
-
-    <!-- ===== TABS ===== -->
-    <div class="tabs" id="tabContainer">
-        <button class="tab-btn active" data-tab="all">All</button>
-        <button class="tab-btn" data-tab="activity">Activity</button>
-        <button class="tab-btn" data-tab="staged">Staged</button>
-        <button class="tab-btn" data-tab="challenge">Challenge</button>
-        <button class="tab-btn" data-tab="top">Top Awards</button>
-        <button class="tab-btn" data-tab="other">Other</button>
     </div>
 
-    <!-- ===== BADGE GRID ===== -->
-    <div class="badge-grid" id="badgeGrid"></div>
+    <div class="progress-box">
+        <div class="label">Overall Progress</div>
+        <div class="percent" id="progressPercent">0%</div>
+        <div class="bar">
+            <div class="fill" id="progressFill"></div>
+        </div>
+    </div>
 
-    <!-- ===== MODAL ===== -->
+    <input type="text" class="search" id="searchBox" placeholder="🔍 Search badges..." />
+
+    <div class="tabs" id="tabContainer">
+        <button class="active" data-tab="all">All</button>
+        <button data-tab="activity">Activity</button>
+        <button data-tab="staged">Staged</button>
+        <button data-tab="challenge">Challenge</button>
+        <button data-tab="top">Top Awards</button>
+        <button data-tab="other">Other</button>
+    </div>
+
+    <div class="grid" id="badgeGrid"></div>
+
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modalContent">
-            <div class="modal-header">
-                <div class="thumb" id="modalThumb">🏅</div>
+        <div class="modal">
+            <div class="head">
+                <div class="icon" id="modalIcon">🏅</div>
                 <div class="info">
                     <h2 id="modalTitle">Badge Name</h2>
                     <div class="cat" id="modalCategory">Category</div>
                 </div>
-                <button class="modal-close" id="modalClose">✕</button>
+                <button class="close" id="modalClose">✕</button>
             </div>
-            <ul class="requirements" id="modalRequirements"></ul>
-            <div class="modal-footer">
+            <ul id="modalRequirements"></ul>
+            <div class="footer">
                 <span class="count" id="modalCount">0 / 0 complete</span>
-                <button class="reset-btn" id="modalReset">Reset this badge</button>
+                <button class="reset" id="modalReset">Reset</button>
             </div>
         </div>
     </div>
 
     <script>
         // ============================================================
-        //  DATA — all Explorer badges with requirements
-        //  (requirements scraped from scouts.org.uk where possible)
+        // DATA - All Explorer Badges
         // ============================================================
 
-        const BADGE_DATA = {
-
-            // ----- ACTIVITY BADGES (from your screenshots) -----
+        var BADGES = {
             "action-sports": {
                 name: "Action Sports",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏄",
-                requirements: [
-                    "Take part in an action sport activity (e.g. skateboarding, snowboarding, parkour) for at least 3 sessions",
-                    "Demonstrate improvement in your chosen action sport",
-                    "Show understanding of safety equipment and risk management",
-                    "Explain the rules and etiquette of your chosen sport"
+                reqs: [
+                    "Take part in an action sport for at least 3 sessions",
+                    "Demonstrate improvement in your chosen sport",
+                    "Show understanding of safety equipment",
+                    "Explain the rules and etiquette of your sport"
                 ]
             },
             "activity-plus": {
                 name: "Activity Plus",
-                category: "activity",
+                cat: "activity",
                 emoji: "⭐",
-                requirements: [
+                reqs: [
                     "Participate in at least 3 different adventurous activities",
-                    "For each activity, explain the key safety considerations",
+                    "Explain safety considerations for each activity",
                     "Show how you've developed skills across multiple activities",
                     "Help plan or lead an activity session for others"
                 ]
             },
             "air-activities": {
                 name: "Air Activities",
-                category: "activity",
+                cat: "activity",
                 emoji: "✈️",
-                requirements: [
-                    "Take part in at least 3 air activities (e.g. flying, gliding, model aircraft)",
+                reqs: [
+                    "Take part in at least 3 air activities",
                     "Show understanding of basic aerodynamics",
                     "Identify aircraft types and their uses",
-                    "Learn about air safety and navigation basics"
+                    "Learn about air safety and navigation"
                 ]
             },
             "athletics": {
                 name: "Athletics",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏃",
-                requirements: [
-                    "Take part in athletics training for at least 6 weeks",
+                reqs: [
+                    "Take part in athletics training for 6 weeks",
                     "Compete in at least 2 athletics events",
-                    "Demonstrate improvement in your chosen discipline(s)",
+                    "Demonstrate improvement in your discipline",
                     "Show understanding of rules and scoring"
                 ]
             },
             "camper": {
                 name: "Camper",
-                category: "activity",
+                cat: "activity",
                 emoji: "⛺",
-                requirements: [
+                reqs: [
                     "Camp for at least 4 nights in different locations",
-                    "Demonstrate ability to pitch and strike a tent independently",
+                    "Pitch and strike a tent independently",
                     "Cook a meal on a camp stove or open fire",
-                    "Show understanding of campsite safety and leave-no-trace principles"
+                    "Show campsite safety and leave-no-trace principles"
                 ]
             },
             "caving": {
                 name: "Caving",
-                category: "activity",
+                cat: "activity",
                 emoji: "🕳️",
-                requirements: [
-                    "Take part in at least 2 caving or mine exploration trips",
-                    "Demonstrate correct use of caving equipment (helmet, light, etc.)",
-                    "Show understanding of cave safety and group management",
+                reqs: [
+                    "Take part in at least 2 caving or mine trips",
+                    "Use caving equipment correctly",
+                    "Show understanding of cave safety",
                     "Learn about cave conservation and geology"
                 ]
             },
             "chef": {
                 name: "Chef",
-                category: "activity",
+                cat: "activity",
                 emoji: "👨‍🍳",
-                requirements: [
+                reqs: [
                     "Plan and cook at least 3 different meals for a group",
-                    "Demonstrate a range of cooking techniques (e.g. boiling, frying, baking)",
+                    "Demonstrate a range of cooking techniques",
                     "Show understanding of food hygiene and safety",
-                    "Create a balanced meal plan considering dietary needs"
+                    "Create a balanced meal plan"
                 ]
             },
             "climber": {
                 name: "Climber",
-                category: "activity",
+                cat: "activity",
                 emoji: "🧗",
-                requirements: [
+                reqs: [
                     "Take part in at least 3 climbing or abseiling sessions",
-                    "Demonstrate correct use of climbing equipment and knots",
-                    "Show understanding of belaying and safety systems",
-                    "Learn about climbing ethics and environmental care"
+                    "Use climbing equipment and knots correctly",
+                    "Show understanding of belaying and safety",
+                    "Learn about climbing ethics"
                 ]
             },
             "coach": {
                 name: "Coach",
-                category: "activity",
+                cat: "activity",
                 emoji: "📣",
-                requirements: [
-                    "Coach or instruct a group in a skill or activity for at least 6 sessions",
-                    "Plan and deliver progressive coaching sessions",
-                    "Demonstrate ability to give constructive feedback",
-                    "Reflect on your coaching and identify improvements"
+                reqs: [
+                    "Coach a group in a skill for at least 6 sessions",
+                    "Plan and deliver progressive sessions",
+                    "Give constructive feedback to others",
+                    "Reflect on your coaching and improve"
                 ]
             },
             "communication": {
                 name: "Communication",
-                category: "activity",
+                cat: "activity",
                 emoji: "📢",
-                requirements: [
+                reqs: [
                     "Plan and deliver a presentation to a group",
-                    "Demonstrate different communication methods (e.g. verbal, written, digital)",
-                    "Show understanding of effective listening and feedback",
-                    "Create a communication piece for a specific audience"
+                    "Use different communication methods",
+                    "Show effective listening and feedback skills",
+                    "Create communication for a specific audience"
                 ]
             },
             "community-impact": {
                 name: "Community Impact",
-                category: "activity",
+                cat: "activity",
                 emoji: "🤝",
-                requirements: [
-                    "Plan and complete a project that benefits your local community",
-                    "Involve others in your project (minimum 3 people)",
+                reqs: [
+                    "Plan a project that benefits your community",
+                    "Involve at least 3 other people in your project",
                     "Demonstrate the impact of your project",
-                    "Reflect on what you learned from the experience"
+                    "Reflect on what you learned"
                 ]
             },
             "content-creation": {
                 name: "Content Creation",
-                category: "activity",
+                cat: "activity",
                 emoji: "🎬",
-                requirements: [
-                    "Create at least 3 pieces of digital content (e.g. video, blog, social media)",
-                    "Demonstrate understanding of content planning and storytelling",
+                reqs: [
+                    "Create at least 3 pieces of digital content",
+                    "Plan and storyboard your content",
                     "Show awareness of online safety and copyright",
-                    "Get feedback and improve your content based on it"
+                    "Get feedback and improve your content"
                 ]
             },
             "creative-arts": {
                 name: "Creative Arts",
-                category: "activity",
+                cat: "activity",
                 emoji: "🎨",
-                requirements: [
-                    "Take part in at least 3 different creative arts activities",
-                    "Produce a piece of creative work (e.g. painting, music, drama)",
-                    "Show understanding of creative techniques and materials",
+                reqs: [
+                    "Take part in at least 3 creative arts activities",
+                    "Produce a piece of creative work",
+                    "Show understanding of creative techniques",
                     "Share or perform your work for others"
                 ]
             },
             "democracy": {
                 name: "Democracy",
-                category: "activity",
+                cat: "activity",
                 emoji: "🗳️",
-                requirements: [
-                    "Learn about how democracy works in your country",
-                    "Take part in a democratic process (e.g. vote, debate, campaign)",
-                    "Show understanding of the roles of different government levels",
-                    "Discuss a current issue and consider different viewpoints"
+                reqs: [
+                    "Learn how democracy works in your country",
+                    "Take part in a democratic process",
+                    "Show understanding of government roles",
+                    "Discuss a current issue and consider different views"
                 ]
             },
             "digital-citizen": {
                 name: "Digital Citizen",
-                category: "activity",
+                cat: "activity",
                 emoji: "💻",
-                requirements: [
+                reqs: [
                     "Demonstrate how to stay safe online",
                     "Show understanding of digital footprint and privacy",
                     "Use digital tools to collaborate with others",
@@ -568,811 +567,788 @@
             },
             "digital-maker": {
                 name: "Digital Maker",
-                category: "activity",
+                cat: "activity",
                 emoji: "🤖",
-                requirements: [
-                    "Create a digital project (e.g. website, app, game, animation)",
-                    "Show understanding of the design and making process",
-                    "Demonstrate at least one digital making skill (e.g. coding, 3D design)",
+                reqs: [
+                    "Create a digital project",
+                    "Show understanding of the design process",
+                    "Demonstrate a digital making skill",
                     "Share your project and get feedback"
                 ]
             },
             "emergency-aid": {
                 name: "Emergency Aid",
-                category: "activity",
+                cat: "activity",
                 emoji: "🚑",
-                requirements: [
-                    "Complete a first aid course (minimum 4 hours)",
-                    "Demonstrate CPR and use of an AED",
-                    "Show understanding of how to handle common emergencies",
-                    "Create a first aid kit and explain its contents"
+                reqs: [
+                    "Complete a first aid course (4+ hours)",
+                    "Demonstrate CPR and AED use",
+                    "Show how to handle common emergencies",
+                    "Create a first aid kit"
                 ]
             },
             "employability-skills": {
                 name: "Employability Skills",
-                category: "activity",
+                cat: "activity",
                 emoji: "💼",
-                requirements: [
-                    "Create or update a CV or skills portfolio",
-                    "Take part in a mock interview or job application process",
-                    "Show understanding of workplace skills (e.g. teamwork, communication)",
+                reqs: [
+                    "Create or update a CV or portfolio",
+                    "Take part in a mock interview",
+                    "Show understanding of workplace skills",
                     "Identify your strengths and areas for development"
                 ]
             },
             "exploration": {
                 name: "Exploration",
-                category: "activity",
+                cat: "activity",
                 emoji: "🗺️",
-                requirements: [
-                    "Plan and complete an exploration (minimum 2 days/nights)",
+                reqs: [
+                    "Plan and complete an exploration (2+ days)",
                     "Use navigation skills to find your way",
-                    "Keep a record of your exploration (log, photos, etc.)",
-                    "Reflect on what you learned and how you worked as a team"
+                    "Keep a record of your exploration",
+                    "Reflect on what you learned"
                 ]
             },
             "fundraising": {
                 name: "Fundraising",
-                category: "activity",
+                cat: "activity",
                 emoji: "💰",
-                requirements: [
-                    "Plan and run a fundraising event or campaign",
-                    "Raise at least £100 (or equivalent) for a cause",
-                    "Show understanding of the cause and where the money goes",
+                reqs: [
+                    "Plan and run a fundraising event",
+                    "Raise at least £100 for a cause",
+                    "Show understanding of the cause",
                     "Promote your fundraising to others"
                 ]
             },
             "global-issues": {
                 name: "Global Issues",
-                category: "activity",
+                cat: "activity",
                 emoji: "🌍",
-                requirements: [
-                    "Research a global issue (e.g. climate change, poverty, migration)",
-                    "Show understanding of different perspectives on the issue",
-                    "Take action to raise awareness or make a difference",
+                reqs: [
+                    "Research a global issue",
+                    "Show understanding of different perspectives",
+                    "Take action to raise awareness",
                     "Reflect on your own role in global issues"
                 ]
             },
             "hikes-away": {
                 name: "Hikes Away",
-                category: "activity",
+                cat: "activity",
                 emoji: "🥾",
-                requirements: [
+                reqs: [
                     "Plan and complete a hike of at least 15km",
-                    "Demonstrate navigation and map reading skills",
-                    "Show understanding of equipment and safety on a hike",
-                    "Keep a log of your hike and what you observed"
+                    "Demonstrate navigation and map reading",
+                    "Show understanding of equipment and safety",
+                    "Keep a log of your hike"
                 ]
             },
             "hill-walker": {
                 name: "Hill Walker",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏔️",
-                requirements: [
+                reqs: [
                     "Take part in at least 3 hill or mountain walks",
-                    "Demonstrate navigation and route planning in upland terrain",
+                    "Navigate in upland terrain",
                     "Show understanding of weather and mountain safety",
-                    "Learn about the countryside code and mountain conservation"
+                    "Learn about the countryside code"
                 ]
             },
             "history-comes-alive": {
                 name: "History Comes Alive",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏛️",
-                requirements: [
+                reqs: [
                     "Research a historical period or event",
-                    "Visit at least 2 historical sites or museums",
-                    "Present your findings to others (e.g. talk, display, video)",
-                    "Show understanding of how history has shaped the present"
+                    "Visit at least 2 historical sites",
+                    "Present your findings to others",
+                    "Show how history shaped the present"
                 ]
             },
             "hobbies": {
                 name: "Hobbies",
-                category: "activity",
+                cat: "activity",
                 emoji: "🎯",
-                requirements: [
-                    "Take up a hobby and practice it for at least 3 months",
+                reqs: [
+                    "Take up a hobby for at least 3 months",
                     "Demonstrate improvement in your hobby",
-                    "Show understanding of the hobby's techniques and history",
+                    "Show understanding of your hobby's history",
                     "Share your hobby with others"
                 ]
             },
             "islamophobia-awareness": {
                 name: "Islamophobia Awareness",
-                category: "activity",
+                cat: "activity",
                 emoji: "☪️",
-                requirements: [
+                reqs: [
                     "Learn about Islam and Muslim cultures",
-                    "Understand what Islamophobia is and its impact",
-                    "Challenge stereotypes or misconceptions about Islam",
-                    "Show allyship and how to support Muslim communities"
+                    "Understand what Islamophobia is",
+                    "Challenge stereotypes about Islam",
+                    "Show how to support Muslim communities"
                 ]
             },
             "leadership": {
                 name: "Leadership",
-                category: "activity",
+                cat: "activity",
                 emoji: "👑",
-                requirements: [
-                    "Lead a team or group on at least 3 occasions",
+                reqs: [
+                    "Lead a team on at least 3 occasions",
                     "Demonstrate different leadership styles",
-                    "Show ability to delegate and motivate others",
-                    "Reflect on your leadership and how to improve"
+                    "Delegate and motivate others effectively",
+                    "Reflect on your leadership and improve"
                 ]
             },
             "life-skills": {
                 name: "Life Skills",
-                category: "activity",
+                cat: "activity",
                 emoji: "🧠",
-                requirements: [
-                    "Learn and demonstrate at least 3 practical life skills (e.g. budgeting, cooking, DIY)",
-                    "Show understanding of personal finance (budgeting, saving, tax)",
+                reqs: [
+                    "Demonstrate 3 practical life skills",
+                    "Show understanding of personal finance",
                     "Demonstrate skills for independent living",
-                    "Plan for a future life goal (e.g. education, career, travel)"
+                    "Plan for a future life goal"
                 ]
             },
             "money-skills": {
                 name: "Money Skills",
-                category: "activity",
+                cat: "activity",
                 emoji: "💰",
-                requirements: [
-                    "Create and manage a personal budget for at least 3 months",
-                    "Show understanding of saving, investing, and debt",
-                    "Learn about different financial products (e.g. bank accounts, insurance)",
-                    "Demonstrate understanding of tax and national insurance"
+                reqs: [
+                    "Create and manage a budget for 3 months",
+                    "Show understanding of saving and investing",
+                    "Learn about financial products",
+                    "Understand tax and national insurance"
                 ]
             },
             "musician": {
                 name: "Musician",
-                category: "activity",
+                cat: "activity",
                 emoji: "🎵",
-                requirements: [
-                    "Learn a musical instrument or improve your singing",
-                    "Perform in front of an audience on at least 3 occasions",
-                    "Show understanding of music theory or technique",
+                reqs: [
+                    "Learn an instrument or improve singing",
+                    "Perform in front of an audience 3 times",
+                    "Show understanding of music theory",
                     "Compose or arrange a piece of music"
                 ]
             },
             "nature": {
                 name: "Nature",
-                category: "activity",
+                cat: "activity",
                 emoji: "🌿",
-                requirements: [
-                    "Take part in at least 3 nature-based activities",
-                    "Identify at least 20 species of plants, birds, or animals",
-                    "Show understanding of local ecosystems and conservation",
-                    "Take action to help the environment (e.g. planting, clean-up)"
+                reqs: [
+                    "Take part in 3 nature-based activities",
+                    "Identify at least 20 species",
+                    "Show understanding of ecosystems",
+                    "Take action to help the environment"
                 ]
             },
             "nautical-skills": {
                 name: "Nautical Skills",
-                category: "activity",
+                cat: "activity",
                 emoji: "⛵",
-                requirements: [
-                    "Take part in at least 3 nautical activities (e.g. sailing, rowing, powerboating)",
-                    "Demonstrate basic nautical knowledge (navigation, tides, safety)",
-                    "Show understanding of boat handling and equipment",
-                    "Learn about the rules of the water"
+                reqs: [
+                    "Take part in 3 nautical activities",
+                    "Show basic nautical knowledge",
+                    "Demonstrate boat handling skills",
+                    "Learn the rules of the water"
                 ]
             },
             "navigator": {
                 name: "Navigator",
-                category: "activity",
+                cat: "activity",
                 emoji: "🧭",
-                requirements: [
+                reqs: [
                     "Demonstrate map reading and compass skills",
-                    "Navigate a route of at least 10km using map and compass",
-                    "Show understanding of GPS and digital navigation",
-                    "Plan a route and identify potential hazards"
+                    "Navigate a route of at least 10km",
+                    "Show GPS and digital navigation skills",
+                    "Plan a route and identify hazards"
                 ]
             },
             "nights-away": {
                 name: "Nights Away",
-                category: "activity",
+                cat: "activity",
                 emoji: "🌙",
-                requirements: [
+                reqs: [
                     "Spend at least 10 nights away on Scout activities",
-                    "Experience at least 3 different types of accommodation (e.g. tent, bothy, hostel)",
-                    "Demonstrate skills for independent living away from home",
-                    "Plan and help run a nights away event for others"
+                    "Experience 3 different types of accommodation",
+                    "Show skills for independent living away from home",
+                    "Help plan a nights away event"
                 ]
             },
             "paddle-sports": {
                 name: "Paddle Sports",
-                category: "activity",
+                cat: "activity",
                 emoji: "🚣",
-                requirements: [
-                    "Take part in at least 3 paddle sports sessions (kayak, canoe, SUP)",
+                reqs: [
+                    "Take part in 3 paddle sports sessions",
                     "Demonstrate ability on calm water",
                     "Show understanding of safety and equipment",
-                    "Learn about water conservation and the environment"
+                    "Learn about water conservation"
                 ]
             },
             "performing-arts": {
                 name: "Performing Arts",
-                category: "activity",
+                cat: "activity",
                 emoji: "🎭",
-                requirements: [
-                    "Take part in at least 3 performing arts activities (drama, dance, music)",
-                    "Perform in front of an audience on at least 2 occasions",
+                reqs: [
+                    "Take part in 3 performing arts activities",
+                    "Perform in front of an audience twice",
                     "Show understanding of performance techniques",
-                    "Contribute to the production of a performance"
+                    "Contribute to a performance production"
                 ]
             },
             "personal-safety": {
                 name: "Personal Safety",
-                category: "activity",
+                cat: "activity",
                 emoji: "🛡️",
-                requirements: [
-                    "Demonstrate understanding of personal safety in different situations",
-                    "Learn about risk assessment and risk management",
-                    "Show understanding of how to stay safe online and offline",
+                reqs: [
+                    "Show personal safety in different situations",
+                    "Learn about risk assessment",
+                    "Stay safe online and offline",
                     "Create a personal safety plan"
                 ]
             },
             "pioneering": {
                 name: "Pioneering",
-                category: "activity",
+                cat: "activity",
                 emoji: "🪚",
-                requirements: [
-                    "Build at least 3 pioneering structures (e.g. tower, bridge, raft)",
+                reqs: [
+                    "Build 3 pioneering structures",
                     "Demonstrate lashing and knot-tying skills",
-                    "Show understanding of structural integrity and safety",
-                    "Plan and lead a pioneering project for others"
+                    "Show understanding of structural safety",
+                    "Plan and lead a pioneering project"
                 ]
             },
             "problem-solver": {
                 name: "Problem Solver",
-                category: "activity",
+                cat: "activity",
                 emoji: "🧩",
-                requirements: [
-                    "Solve a complex problem using a structured approach",
-                    "Demonstrate at least 3 different problem-solving techniques",
+                reqs: [
+                    "Solve a complex problem with a structured approach",
+                    "Use 3 different problem-solving techniques",
                     "Work with others to solve a problem",
-                    "Reflect on your problem-solving process and how to improve"
+                    "Reflect on your problem-solving process"
                 ]
             },
             "stem": {
                 name: "S.T.E.M",
-                category: "activity",
+                cat: "activity",
                 emoji: "🔬",
-                requirements: [
-                    "Complete at least 3 STEM projects or experiments",
+                reqs: [
+                    "Complete 3 STEM projects or experiments",
                     "Show understanding of the scientific method",
-                    "Demonstrate a STEM skill (e.g. coding, engineering, data analysis)",
+                    "Demonstrate a STEM skill",
                     "Explain a STEM concept to others"
                 ]
             },
             "sailing": {
                 name: "Sailing",
-                category: "activity",
+                cat: "activity",
                 emoji: "⛵",
-                requirements: [
-                    "Take part in at least 3 sailing sessions",
-                    "Demonstrate ability to sail a small boat",
+                reqs: [
+                    "Take part in 3 sailing sessions",
+                    "Sail a small boat",
                     "Show understanding of wind, tides, and navigation",
-                    "Learn about sailing safety and rules of the water"
+                    "Learn sailing safety and rules"
                 ]
             },
             "snowsports": {
                 name: "Snowsports",
-                category: "activity",
+                cat: "activity",
                 emoji: "⛷️",
-                requirements: [
-                    "Take part in at least 3 snowsports sessions (ski, snowboard)",
+                reqs: [
+                    "Take part in 3 snowsports sessions",
                     "Demonstrate ability on beginner/intermediate slopes",
-                    "Show understanding of safety equipment and avalanche awareness",
-                    "Learn about snowsport etiquette and mountain safety"
+                    "Show understanding of safety equipment",
+                    "Learn snowsport etiquette"
                 ]
             },
             "space": {
                 name: "Space",
-                category: "activity",
+                cat: "activity",
                 emoji: "🚀",
-                requirements: [
+                reqs: [
                     "Learn about space exploration and astronomy",
-                    "Observe the night sky using a telescope or binoculars",
-                    "Build or program a simple space-related model or device",
-                    "Explain a space-related concept (e.g. gravity, orbits, light years)"
+                    "Observe the night sky with a telescope",
+                    "Build a space-related model or device",
+                    "Explain a space concept"
                 ]
             },
             "sports-and-fitness": {
                 name: "Sports and Fitness",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏋️",
-                requirements: [
-                    "Take part in regular sports or fitness training (minimum 6 weeks)",
-                    "Demonstrate improvement in fitness (e.g. endurance, strength)",
-                    "Show understanding of nutrition and healthy lifestyle",
-                    "Set a fitness goal and work towards it"
+                reqs: [
+                    "Train regularly for at least 6 weeks",
+                    "Demonstrate improvement in fitness",
+                    "Show understanding of nutrition",
+                    "Set and work towards a fitness goal"
                 ]
             },
             "survival-skills": {
                 name: "Survival Skills",
-                category: "activity",
+                cat: "activity",
                 emoji: "🔥",
-                requirements: [
-                    "Build a shelter using natural materials",
-                    "Light a fire without matches or a lighter",
-                    "Show understanding of finding and purifying water",
-                    "Demonstrate basic signalling and rescue techniques"
+                reqs: [
+                    "Build a shelter from natural materials",
+                    "Light a fire without matches",
+                    "Find and purify water",
+                    "Demonstrate signalling and rescue techniques"
                 ]
             },
             "swimmer": {
                 name: "Swimmer",
-                category: "activity",
+                cat: "activity",
                 emoji: "🏊",
-                requirements: [
+                reqs: [
                     "Swim at least 100m continuously",
                     "Show understanding of water safety",
-                    "Learn at least 2 different swimming strokes",
-                    "Demonstrate a rescue technique or lifesaving skill"
+                    "Learn 2 different swimming strokes",
+                    "Demonstrate a rescue technique"
                 ]
             },
             "teamwork": {
                 name: "Teamwork",
-                category: "activity",
+                cat: "activity",
                 emoji: "🤝",
-                requirements: [
-                    "Work as part of a team on at least 3 different projects",
-                    "Show understanding of team roles and dynamics",
-                    "Demonstrate ability to give and receive feedback",
-                    "Reflect on team performance and how to improve collaboration"
+                reqs: [
+                    "Work as part of a team on 3 different projects",
+                    "Show understanding of team roles",
+                    "Give and receive feedback",
+                    "Reflect on team performance"
                 ]
             },
-
-            // ----- CHALLENGE AWARDS (from website) -----
             "challenge-adventure": {
                 name: "Adventure Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "🏔️",
-                requirements: [
-                    "Identify an adventure challenge you want to take on",
-                    "Plan your challenge including logistics, equipment, and safety",
+                reqs: [
+                    "Identify an adventure challenge to take on",
+                    "Plan your challenge including logistics and safety",
                     "Complete your adventure challenge",
-                    "Review and reflect on what you learned and how you grew"
+                    "Review and reflect on what you learned"
                 ]
             },
             "challenge-community": {
                 name: "Community Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "🏘️",
-                requirements: [
-                    "Identify a community issue you want to address",
-                    "Plan a community project including resources and timeline",
+                reqs: [
+                    "Identify a community issue to address",
+                    "Plan your community project",
                     "Carry out your community project",
-                    "Review and reflect on the impact you made"
+                    "Review and reflect on your impact"
                 ]
             },
             "challenge-employability": {
                 name: "Employability Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "💪",
-                requirements: [
-                    "Identify skills you want to develop for employability",
+                reqs: [
+                    "Identify skills to develop for work",
                     "Plan activities to develop these skills",
-                    "Take action to gain employability experience",
-                    "Review and reflect on your employability journey"
+                    "Gain employability experience",
+                    "Review your employability journey"
                 ]
             },
             "challenge-international": {
                 name: "International Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "🌎",
-                requirements: [
+                reqs: [
                     "Identify an international issue or opportunity",
-                    "Plan an international-focused project or experience",
+                    "Plan an international-focused project",
                     "Carry out your international project",
-                    "Review and reflect on your international understanding"
+                    "Reflect on your international understanding"
                 ]
             },
             "challenge-leadership": {
                 name: "Leadership Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "👑",
-                requirements: [
-                    "Identify a leadership opportunity you want to pursue",
-                    "Plan your leadership journey including goals and support",
-                    "Take on a leadership role and lead others",
-                    "Review and reflect on your leadership development"
+                reqs: [
+                    "Find a leadership opportunity",
+                    "Plan your leadership journey",
+                    "Take on a leadership role",
+                    "Review your leadership development"
                 ]
             },
             "challenge-values": {
                 name: "Values Challenge",
-                category: "challenge",
+                cat: "challenge",
                 emoji: "❤️",
-                requirements: [
-                    "Identify the Scout values you want to explore",
-                    "Plan activities that demonstrate these values in action",
-                    "Live out the Scout values in your project",
-                    "Review and reflect on how values shape your actions"
+                reqs: [
+                    "Explore Scout values you care about",
+                    "Plan activities that demonstrate these values",
+                    "Live out Scout values in your project",
+                    "Reflect on how values shape your actions"
                 ]
             },
-
-            // ----- TOP AWARDS (from website) -----
             "chiefs-platinum": {
                 name: "Chief Scout's Platinum Award",
-                category: "top",
+                cat: "top",
                 emoji: "⭐",
-                requirements: [
-                    "Complete a minimum of 6 months as an Explorer Scout",
+                reqs: [
+                    "Complete 6 months as an Explorer Scout",
                     "Complete at least 2 Challenge Awards",
-                    "Complete at least 2 Activity Badges (or 1 Staged Badge at level 5)",
-                    "Plan and complete a project as part of the International, Community and Values (ICV) list",
-                    "Be an active member of your Explorer Unit"
+                    "Complete at least 2 Activity Badges",
+                    "Complete an ICV project",
+                    "Be an active member of your Unit"
                 ]
             },
             "chiefs-diamond": {
                 name: "Chief Scout's Diamond Award",
-                category: "top",
+                cat: "top",
                 emoji: "💎",
-                requirements: [
-                    "Complete a minimum of 12 months as an Explorer Scout",
+                reqs: [
+                    "Complete 12 months as an Explorer Scout",
                     "Complete at least 3 Challenge Awards",
                     "Complete at least 3 Activity Badges",
                     "Complete 1 Staged Badge at level 4 or above",
-                    "Plan and complete a project as part of the International, Community and Values (ICV) list",
+                    "Complete an ICV project",
                     "Show leadership and personal development"
                 ]
             },
             "kings-scout": {
                 name: "King's Scout Award",
-                category: "top",
+                cat: "top",
                 emoji: "👑",
-                requirements: [
-                    "Complete a minimum of 18 months as an Explorer Scout or Network member",
+                reqs: [
+                    "Complete 18 months as an Explorer or Network member",
                     "Complete all 4 Challenge Awards",
-                    "Complete at least 4 Activity Badges (or a combination with Staged Badges)",
-                    "Complete the International, Community and Values (ICV) project",
-                    "Complete an expedition of at least 4 days/3 nights",
-                    "Complete a residential project or experience",
-                    "Show significant personal development and leadership"
+                    "Complete at least 4 Activity Badges",
+                    "Complete the ICV project",
+                    "Complete a 4-day expedition",
+                    "Complete a residential project",
+                    "Show significant personal development"
                 ]
             },
             "explorer-belt": {
                 name: "Explorer Belt",
-                category: "top",
+                cat: "top",
                 emoji: "🌍",
-                requirements: [
-                    "Plan a 10-day expedition to an unfamiliar country or region",
-                    "Complete a project or challenge during your expedition",
+                reqs: [
+                    "Plan a 10-day expedition to a new country or region",
+                    "Complete a project during your expedition",
                     "Engage with local culture and people",
-                    "Keep a log of your journey and reflections",
-                    "Present your findings and experience to others"
+                    "Keep a log of your journey",
+                    "Present your experience to others"
                 ]
             },
             "young-leader": {
                 name: "Young Leader Award",
-                category: "top",
+                cat: "top",
                 emoji: "🧑‍🏫",
-                requirements: [
-                    "Complete the Young Leader training modules",
-                    "Volunteer for at least 12 months with a younger section",
-                    "Log your volunteering hours and experiences",
-                    "Demonstrate leadership and mentoring skills",
-                    "Complete the Young Leader Award assessment"
+                reqs: [
+                    "Complete Young Leader training modules",
+                    "Volunteer for at least 12 months",
+                    "Log your volunteering hours",
+                    "Demonstrate leadership and mentoring",
+                    "Complete the assessment"
                 ]
             },
-
-            // ----- OTHER AWARDS (from website) -----
             "membership": {
                 name: "Membership Award",
-                category: "other",
+                cat: "other",
                 emoji: "🔰",
-                requirements: [
+                reqs: [
                     "Make the Scout Promise",
                     "Be invested as a member of Explorers",
-                    "Learn about the Scout values and what they mean"
+                    "Learn about Scout values"
                 ]
             },
             "joining-in": {
                 name: "Joining In Award",
-                category: "other",
+                cat: "other",
                 emoji: "🎉",
-                requirements: [
+                reqs: [
                     "Be a member of Explorers for at least 1 year",
                     "Take part in the programme and activities",
-                    "Contribute to the life of your Unit"
+                    "Contribute to your Unit"
                 ]
             },
             "moving-on": {
                 name: "Moving On Award",
-                category: "other",
+                cat: "other",
                 emoji: "🚀",
-                requirements: [
-                    "Be preparing to move to Scout Network",
-                    "Complete a transition plan or project",
-                    "Celebrate your time in Explorers and look forward to the future"
+                reqs: [
+                    "Prepare to move to Scout Network",
+                    "Complete a transition plan",
+                    "Celebrate your time in Explorers"
                 ]
             },
             "youshape": {
                 name: "YouShape Award",
-                category: "other",
+                cat: "other",
                 emoji: "🌟",
-                requirements: [
-                    "Identify something you want to change or improve in your community",
-                    "Plan a project to make this change happen",
-                    "Carry out your project and involve others",
-                    "Reflect on your learning and the impact you made"
+                reqs: [
+                    "Identify something to change in your community",
+                    "Plan a project to make it happen",
+                    "Carry out your project",
+                    "Reflect on your learning and impact"
                 ]
             },
             "earth-tribe": {
                 name: "Earth Tribe Award",
-                category: "other",
+                cat: "other",
                 emoji: "🌱",
-                requirements: [
-                    "Learn about global environmental challenges",
-                    "Take action to reduce your environmental impact",
+                reqs: [
+                    "Learn about environmental challenges",
+                    "Take action to reduce your impact",
                     "Complete an environmental project",
-                    "Inspire others to take environmental action"
+                    "Inspire others to take action"
                 ]
             }
         };
 
         // ============================================================
-        //  APP STATE
+        // STATE
         // ============================================================
 
-        let state = {
-            completed: {}, // keyed by "badgeId-requirementIndex" => true/false
-            activeTab: "all",
-            searchQuery: "",
-            currentBadge: null // for modal
+        var state = {
+            done: {},
+            tab: "all",
+            search: "",
+            current: null
         };
 
-        // Load from localStorage
-        function loadState() {
+        function load() {
             try {
-                const saved = localStorage.getItem("explorerTrackerState");
+                var saved = localStorage.getItem("explorerTracker");
                 if (saved) {
-                    const parsed = JSON.parse(saved);
-                    state.completed = parsed.completed || {};
+                    var parsed = JSON.parse(saved);
+                    state.done = parsed.done || {};
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+                console.warn("Could not load saved data:", e);
+            }
         }
 
-        function saveState() {
+        function save() {
             try {
-                localStorage.setItem("explorerTrackerState", JSON.stringify({
-                    completed: state.completed
-                }));
-            } catch (e) { /* ignore */ }
+                localStorage.setItem("explorerTracker", JSON.stringify({ done: state.done }));
+            } catch (e) {
+                console.warn("Could not save data:", e);
+            }
         }
 
         // ============================================================
-        //  RENDER FUNCTIONS
+        // HELPERS
         // ============================================================
 
-        function getBadgeProgress(badgeId) {
-            const badge = BADGE_DATA[badgeId];
-            if (!badge) return { done: 0, total: 0, percent: 0 };
-            const total = badge.requirements.length;
-            let done = 0;
-            badge.requirements.forEach((req, i) => {
-                if (state.completed[`${badgeId}-${i}`]) done++;
-            });
-            return { done, total, percent: total > 0 ? Math.round((done / total) * 100) : 0 };
+        function getProgress(id) {
+            var badge = BADGES[id];
+            if (!badge) return { done: 0, total: 0, pct: 0 };
+            var total = badge.reqs.length;
+            var done = 0;
+            for (var i = 0; i < total; i++) {
+                if (state.done[id + "-" + i]) done++;
+            }
+            return { done: done, total: total, pct: total > 0 ? Math.round((done / total) * 100) : 0 };
         }
 
         function getAllProgress() {
-            let totalDone = 0,
+            var totalDone = 0,
                 totalReqs = 0;
-            Object.keys(BADGE_DATA).forEach(id => {
-                const b = BADGE_DATA[id];
-                b.requirements.forEach((req, i) => {
+            for (var id in BADGES) {
+                var b = BADGES[id];
+                for (var i = 0; i < b.reqs.length; i++) {
                     totalReqs++;
-                    if (state.completed[`${id}-${i}`]) totalDone++;
+                    if (state.done[id + "-" + i]) totalDone++;
+                }
+            }
+            return { done: totalDone, total: totalReqs, pct: totalReqs > 0 ? Math.round((totalDone / totalReqs) * 100) : 0 };
+        }
+
+        function getFiltered() {
+            var ids = Object.keys(BADGES);
+            if (state.tab !== "all") {
+                ids = ids.filter(function(id) {
+                    return BADGES[id].cat === state.tab;
                 });
-            });
-            return { done: totalDone, total: totalReqs, percent: totalReqs > 0 ? Math.round((totalDone / totalReqs) *
-                100) : 0 };
+            }
+            if (state.search.trim()) {
+                var q = state.search.toLowerCase().trim();
+                ids = ids.filter(function(id) {
+                    return BADGES[id].name.toLowerCase().includes(q);
+                });
+            }
+            return ids;
+        }
+
+        // ============================================================
+        // RENDER
+        // ============================================================
+
+        function renderAll() {
+            renderProgress();
+            renderGrid();
+            document.getElementById("badgeCount").textContent = Object.keys(BADGES).length;
         }
 
         function renderProgress() {
-            const p = getAllProgress();
-            document.getElementById("progressPercent").textContent = p.percent + "%";
-            document.getElementById("progressFill").style.width = p.percent + "%";
-            document.getElementById("totalBadgeCount").textContent = Object.keys(BADGE_DATA).length;
-        }
-
-        function getFilteredBadges() {
-            const allIds = Object.keys(BADGE_DATA);
-            let filtered = allIds;
-
-            // Tab filter
-            if (state.activeTab !== "all") {
-                filtered = filtered.filter(id => BADGE_DATA[id].category === state.activeTab);
-            }
-
-            // Search filter
-            if (state.searchQuery.trim()) {
-                const q = state.searchQuery.toLowerCase().trim();
-                filtered = filtered.filter(id => BADGE_DATA[id].name.toLowerCase().includes(q));
-            }
-
-            return filtered;
+            var p = getAllProgress();
+            document.getElementById("progressPercent").textContent = p.pct + "%";
+            document.getElementById("progressFill").style.width = p.pct + "%";
         }
 
         function renderGrid() {
-            const grid = document.getElementById("badgeGrid");
-            const ids = getFilteredBadges();
+            var ids = getFiltered();
+            var grid = document.getElementById("badgeGrid");
 
             if (ids.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="grid-column:1/-1;">
-                        <div class="icon">🔍</div>
-                        <p>No badges found matching your filters.</p>
-                    </div>
-                `;
+                grid.innerHTML =
+                    '<div class="empty"><span class="big">🔍</span>No badges found matching your filters.</div>';
                 return;
             }
 
-            let html = "";
-            ids.forEach(id => {
-                const badge = BADGE_DATA[id];
-                const prog = getBadgeProgress(id);
-                const isComplete = prog.percent === 100 && prog.total > 0;
-                const isStaged = badge.category === "staged";
-
-                html += `
-                    <div class="badge-card" data-badge="${id}" onclick="openModal('${id}')">
-                        ${isComplete ? `<div class="check-mark complete">✓</div>` : `<div class="check-mark">✓</div>`}
-                        <div class="badge-img">${badge.emoji}</div>
-                        <div class="badge-name">${badge.name}</div>
-                        <div class="badge-progress">${prog.done}/${prog.total}</div>
-                        ${isStaged ? '<div style="font-size:10px;color:#888;margin-top:2px;">Staged</div>' : ''}
-                    </div>
-                `;
-            });
-
+            var html = "";
+            for (var i = 0; i < ids.length; i++) {
+                var id = ids[i];
+                var b = BADGES[id];
+                var p = getProgress(id);
+                var done = p.pct === 100 && p.total > 0;
+                html += '<div class="card" onclick="openModal(\'' + id + '\')">';
+                html += '<div class="check' + (done ? ' done' : '') + '">✓</div>';
+                html += '<div class="emoji">' + b.emoji + '</div>';
+                html += '<div class="name">' + b.name + '</div>';
+                html += '<div class="progress">' + p.done + '/' + p.total + '</div>';
+                html += '</div>';
+            }
             grid.innerHTML = html;
         }
 
         // ============================================================
-        //  MODAL FUNCTIONS
+        // MODAL
         // ============================================================
 
-        function openModal(badgeId) {
-            const badge = BADGE_DATA[badgeId];
-            if (!badge) return;
-            state.currentBadge = badgeId;
+        function openModal(id) {
+            var b = BADGES[id];
+            if (!b) return;
+            state.current = id;
 
-            // Set header
-            document.getElementById("modalTitle").textContent = badge.name;
-            document.getElementById("modalThumb").innerHTML = badge.emoji;
-            const categoryMap = {
-                activity: "Activity Badge",
-                staged: "Staged Badge",
-                challenge: "Challenge Award",
-                top: "Top Award",
-                other: "Other Award"
-            };
-            document.getElementById("modalCategory").textContent = categoryMap[badge.category] || badge.category;
+            document.getElementById("modalIcon").textContent = b.emoji;
+            document.getElementById("modalTitle").textContent = b.name;
+            var catMap = { activity: "Activity Badge", staged: "Staged Badge", challenge: "Challenge Award",
+                top: "Top Award", other: "Other Award" };
+            document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
-            // Requirements
-            const list = document.getElementById("modalRequirements");
-            let html = "";
-            badge.requirements.forEach((req, i) => {
-                const key = `${badgeId}-${i}`;
-                const done = !!state.completed[key];
-                html += `
-                    <li>
-                        <input type="checkbox" ${done ? 'checked' : ''} onchange="toggleRequirement('${badgeId}', ${i})" />
-                        <span class="req-text ${done ? 'done' : ''}">${req}</span>
-                    </li>
-                `;
-            });
+            var list = document.getElementById("modalRequirements");
+            var html = "";
+            for (var i = 0; i < b.reqs.length; i++) {
+                var key = id + "-" + i;
+                var done = !!state.done[key];
+                html += '<li>';
+                html += '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleReq(\'' + id + '\',' + i +
+                    ')" />';
+                html += '<span class="text' + (done ? ' done' : '') + '">' + b.reqs[i] + '</span>';
+                html += '</li>';
+            }
             list.innerHTML = html;
 
-            // Footer
-            const prog = getBadgeProgress(badgeId);
-            document.getElementById("modalCount").textContent = `${prog.done} / ${prog.total} complete`;
+            var p = getProgress(id);
+            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
-            // Show modal
-            document.getElementById("modalOverlay").classList.add("open");
+            document.getElementById("modalOverlay").className = "modal-overlay show";
         }
 
         function closeModal() {
-            document.getElementById("modalOverlay").classList.remove("open");
-            state.currentBadge = null;
+            document.getElementById("modalOverlay").className = "modal-overlay";
+            state.current = null;
         }
 
-        function toggleRequirement(badgeId, index) {
-            const key = `${badgeId}-${index}`;
-            state.completed[key] = !state.completed[key];
-            saveState();
+        function toggleReq(id, index) {
+            var key = id + "-" + index;
+            state.done[key] = !state.done[key];
+            save();
 
             // Update modal UI
-            const badge = BADGE_DATA[badgeId];
-            if (!badge) return;
-            const prog = getBadgeProgress(badgeId);
-            document.getElementById("modalCount").textContent = `${prog.done} / ${prog.total} complete`;
+            var p = getProgress(id);
+            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
-            // Update checkboxes and text styling
-            const items = document.querySelectorAll("#modalRequirements li");
+            var items = document.querySelectorAll("#modalRequirements li");
             if (items[index]) {
-                const cb = items[index].querySelector('input[type="checkbox"]');
-                const text = items[index].querySelector(".req-text");
-                if (cb) cb.checked = !!state.completed[key];
-                if (text) text.classList.toggle("done", !!state.completed[key]);
+                var cb = items[index].querySelector('input[type="checkbox"]');
+                var text = items[index].querySelector(".text");
+                if (cb) cb.checked = !!state.done[key];
+                if (text) {
+                    if (state.done[key]) {
+                        text.className = "text done";
+                    } else {
+                        text.className = "text";
+                    }
+                }
             }
 
-            // Refresh grid and progress
-            renderGrid();
-            renderProgress();
+            renderAll();
         }
 
         function resetBadge() {
-            const badgeId = state.currentBadge;
-            if (!badgeId) return;
-            const badge = BADGE_DATA[badgeId];
-            if (!badge) return;
-            if (!confirm(`Reset all progress for "${badge.name}"?`)) return;
+            var id = state.current;
+            if (!id) return;
+            var b = BADGES[id];
+            if (!b) return;
+            if (!confirm('Reset all progress for "' + b.name + '"?')) return;
 
-            badge.requirements.forEach((req, i) => {
-                delete state.completed[`${badgeId}-${i}`];
-            });
-            saveState();
+            for (var i = 0; i < b.reqs.length; i++) {
+                delete state.done[id + "-" + i];
+            }
+            save();
 
             // Re-render modal
-            const prog = getBadgeProgress(badgeId);
-            document.getElementById("modalCount").textContent = `${prog.done} / ${prog.total} complete`;
+            var p = getProgress(id);
+            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
 
-            // Update all checkboxes in modal
-            const items = document.querySelectorAll("#modalRequirements li");
-            items.forEach((li, i) => {
-                const cb = li.querySelector('input[type="checkbox"]');
-                const text = li.querySelector(".req-text");
-                const key = `${badgeId}-${i}`;
+            var items = document.querySelectorAll("#modalRequirements li");
+            for (var j = 0; j < items.length; j++) {
+                var cb = items[j].querySelector('input[type="checkbox"]');
+                var text = items[j].querySelector(".text");
+                var key = id + "-" + j;
                 if (cb) cb.checked = false;
-                if (text) text.classList.remove("done");
-            });
+                if (text) text.className = "text";
+            }
 
-            renderGrid();
-            renderProgress();
+            renderAll();
         }
 
         // ============================================================
-        //  EVENT BINDING & INIT
+        // EVENT BINDING
         // ============================================================
 
-        // Modal close events
-        document.getElementById("modalClose").addEventListener("click", closeModal);
-        document.getElementById("modalOverlay").addEventListener("click", function(e) {
+        document.getElementById("modalClose").onclick = closeModal;
+        document.getElementById("modalOverlay").onclick = function(e) {
             if (e.target === this) closeModal();
-        });
-        document.getElementById("modalReset").addEventListener("click", resetBadge);
+        };
+        document.getElementById("modalReset").onclick = resetBadge;
 
-        // Tabs
-        document.querySelectorAll(".tab-btn").forEach(btn => {
-            btn.addEventListener("click", function() {
-                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-                this.classList.add("active");
-                state.activeTab = this.dataset.tab;
-                renderGrid();
-            });
-        });
+        var tabButtons = document.querySelectorAll(".tabs button");
+        for (var t = 0; t < tabButtons.length; t++) {
+            tabButtons[t].onclick = function() {
+                for (var b = 0; b < tabButtons.length; b++) {
+                    tabButtons[b].className = "";
+                }
+                this.className = "active";
+                state.tab = this.dataset.tab;
+                renderAll();
+            };
+        }
 
-        // Search
-        document.getElementById("searchBox").addEventListener("input", function() {
-            state.searchQuery = this.value;
-            renderGrid();
-        });
+        document.getElementById("searchBox").oninput = function() {
+            state.search = this.value;
+            renderAll();
+        };
 
-        // Keyboard shortcut: Escape to close modal
-        document.addEventListener("keydown", function(e) {
+        document.onkeydown = function(e) {
             if (e.key === "Escape") closeModal();
-        });
+        };
 
         // ============================================================
-        //  BOOT
+        // BOOT
         // ============================================================
 
-        loadState();
-        renderProgress();
-        renderGrid();
-
+        load();
+        renderAll();
         console.log("🏕️ Explorer Badge Tracker loaded!");
-        console.log(`📊 ${Object.keys(BADGE_DATA).length} badges loaded.`);
-        console.log("💾 Data saved to localStorage.");
+        console.log("📊 " + Object.keys(BADGES).length + " badges loaded.");
     </script>
 </body>
 </html>
