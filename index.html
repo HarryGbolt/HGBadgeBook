@@ -319,6 +319,13 @@
             color: #1a1a2e;
             margin-bottom: 12px;
         }
+        .modal-body .mandatory-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
         .modal-body .choose-hint {
             font-size: 14px;
             color: #4a2c8a;
@@ -326,7 +333,7 @@
             background: #f5f3ff;
             padding: 8px 14px;
             border-radius: 10px;
-            margin-bottom: 12px;
+            margin: 8px 0 12px;
         }
         .modal-body ul {
             list-style: none;
@@ -336,7 +343,7 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f0f5;
             font-size: 15px;
             line-height: 1.4;
@@ -355,6 +362,10 @@
             border-radius: 6px;
         }
         .modal-body ul li .text.done {
+            text-decoration: line-through;
+            color: #bbb;
+        }
+        .modal-body ul li .text.mandatory-done {
             text-decoration: line-through;
             color: #bbb;
         }
@@ -663,8 +674,7 @@
             <div class="modal-body" id="modalBody">
                 <div class="stage-selector" id="stageSelector" style="display:none;"></div>
                 <div class="requirements-title" id="requirementsTitle">Requirements</div>
-                <div class="choose-hint" id="chooseHint" style="display:none;"></div>
-                <ul id="modalRequirements"></ul>
+                <div id="modalContentArea"></div>
             </div>
             <div class="modal-footer">
                 <div class="footer-left">
@@ -703,16 +713,17 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/uhcf2wnp/activitybadge_ex_action-sports_rgb.png",
-                reqs: [
-                    "Take part in at least one session of an Action Sport of your choice. Ensure that supervision is provided by an appropriately qualified person if your action sport requires one.",
+                mandatory: [
+                    "Take part in at least one session of an Action Sport of your choice. Ensure that supervision is provided by an appropriately qualified person if your action sport requires one."
+                ],
+                options: [
                     "Discover - Find out how an action sport has changed since it's invention. Look at the technology used and how it's image has changed.",
                     "Experience - Take part in an action sport. Learn the skills required for the activity, any equipment used, and how to keep yourself safe.",
                     "Mobilise - Find out about action sport opportunities in your community. What can you do to help a community sports club? Work with them on one of their development targets.",
                     "Solve - Plan a trip to take part in an action sport of your choice. Think about how you'll get there, what costs are involved and what kit you'll need.",
                     "Create - Create a new piece of equipment or accessory that can be used for an action sport of your choice."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "athletics": {
                 name: "Athletics",
@@ -734,32 +745,34 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ho1fqdjz/activitybadge_ex_camper_with-cologo_rgb.png",
-                reqs: [
-                    "Camp outdoors for a total of seven nights across two events or more as an Explorer, including at least three nights as part of this badge.",
+                mandatory: [
+                    "Camp outdoors for a total of seven nights across two events or more as an Explorer, including at least three nights as part of this badge."
+                ],
+                options: [
                     "Discover - Investigate how camping equipment has changed in the past 20-40 years. Focus on one area which interests you.",
                     "Experience - Use three different types of camping stove to cook a meal. Think about which stove works best and explore how to keep yourself, others, and the environment safe.",
                     "Mobilise - Help your local campsite to plan and implement one way they can be more inclusive and accessible.",
                     "Solve - Plan, budget and execute a camp. You should include activities, a menu and appropriate risk assessments for your Unit.",
                     "Create - Design a local campsite directory, campfire songbook or camp recipe book which could be used by anyone in your group."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "caving": {
                 name: "Caving",
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/k50l5tge/activitybadge_ex_caving_rgb.png",
-                reqs: [
-                    "Take part in at least one caving trip as part of completing this badge. Make sure your trip is supervised by an appropriately qualified person.",
+                mandatory: [
+                    "Take part in at least one caving trip as part of completing this badge. Make sure your trip is supervised by an appropriately qualified person."
+                ],
+                options: [
                     "Discover - Find out how caves are formed. This might be a cave system local to you or a famous cave system. Understand and explain how it was formed.",
                     "Experience - Take part in a caving trip. It's important to make sure you do it safely, with a properly led group and relevant qualifications or safety permits in place.",
                     "Mobilise - Find out about our responsibilities when caving. This might include cave conservation, safety systems or access rights to caves.",
                     "Solve - Learn how to set up a prussik line for vertical caving and have a go at using it. It's a good idea to have someone experienced and qualified check it's right.",
                     "Create - Create a model cave system showing the reasons that the system formed. It could be based on a cave system that you have visited."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "chef": {
                 name: "Chef",
@@ -781,16 +794,17 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/j52dlila/activitybadge_ex_climber_rgb.png",
-                reqs: [
-                    "Take part in at least two sessions of climbing, indoor or out, while completing this badge. Make sure your session is supervised by an appropriately qualified person.",
+                mandatory: [
+                    "Take part in at least two sessions of climbing, indoor or out, while completing this badge. Make sure your session is supervised by an appropriately qualified person."
+                ],
+                options: [
                     "Discover - Find out about the history of Climbing in the UK. Consider how the sport, equipment and access has evolved over the years.",
                     "Experience - Take part in two different types of climbing and find out about how these climbs are graded and recorded.",
                     "Mobilise - Consider accessibility within climbing - how it could be more accessible and encourage more people into the sport.",
                     "Solve - Look at different safety equipment, discover and discuss how we use it and what each item does. Work out why equipment does not work when it's not used properly.",
                     "Create - Create a guidebook entry for a climb you've done. Consider the information other climbers would need."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "coach": {
                 name: "Coach",
@@ -932,16 +946,17 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/tb0c0uj1/activitybadge_ex_hill_walker_rgb.png",
-                reqs: [
-                    "Take part in at least two journeys in terrain 2 areas. An appropriately qualified person must accompany or supervise the journeys.",
+                mandatory: [
+                    "Take part in at least two journeys in terrain 2 areas. An appropriately qualified person must accompany or supervise the journeys."
+                ],
+                options: [
                     "Discover - Research how to prepare for a multi-day hillwalking expedition in terrain one or two.",
                     "Experience - Take part in a hill walk in terrain one or two, contributing to navigation, pacing, and group decision-making.",
                     "Mobilise - Join a conservation or access-focused activity during a hill or mountain day.",
                     "Solve - Create and act out realistic emergency scenarios in a hill environment, using appropriate equipment and techniques.",
                     "Create - Create a detailed walk plan and terrain model for a challenging hill walk, using either digital or physical materials."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "hobbies": {
                 name: "Hobbies",
@@ -1053,16 +1068,17 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/fgod0fsz/activitybadge_ex_pioneering_rgb.png",
-                reqs: [
-                    "Take part in at least one large scale Pioneering project. You should complete your project over the course of a day.",
+                mandatory: [
+                    "Take part in at least one large scale Pioneering project. You should complete your project over the course of a day."
+                ],
+                options: [
                     "Discover - Investigate how pioneering projects or inventions have become essential to modern architecture.",
                     "Experience - Take part in a pioneering project. This could be a large structure made within a team, or a smaller structure made solo.",
                     "Mobilise - Research a pioneered structure and lead a team to plan and complete its construction.",
                     "Solve - Use rubber bands and lolly sticks to create a bridge or a similar project. How much weight can it hold? How could you make it stronger?",
                     "Create - Design a useful pioneered structure and build it in real life. Include drawings, a scale model, and a guide on how to create it."
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
             "problem-solver": {
                 name: "Problem Solver",
@@ -1174,16 +1190,17 @@
                 cat: "activity",
                 categoryLabel: "Activity Badges",
                 image: "https://prod-cms.scouts.org.uk/media/ejhhwsmm/activitybadge_ex_water-activities_rgb.png",
-                reqs: [
-                    "Take part in at least two activities that take place on or in the water while earning this badge. The activity should be supervised by an appropriately qualified person.",
+                mandatory: [
+                    "Take part in at least two activities that take place on or in the water while earning this badge. The activity should be supervised by an appropriately qualified person."
+                ],
+                options: [
                     "Discover - Find out about the history of a water activity, or an inspirational person who takes part in water activities.",
                     "Experience - Plan a 2-3 hour journey for a chosen water activity, then carry it out with an appropriately qualified person.",
                     "Mobilise - Learn about water quality issues. Find out about a campaign near you and take part in an activity to support the work they do.",
                     "Solve - Think about what could happen if things go wrong. Practice some rescue techniques and find out how to keep each other safe.",
                     "Create - Design a craft or equipment you might use in water activities. You could even build your craft and try it out on some water!"
                 ],
-                choose: 3,
-                totalOptions: 5
+                choose: 3
             },
 
             // =========================================================
@@ -2034,7 +2051,8 @@
             favourites: [],
             currentPage: "home",
             modalView: null,
-            userName: ""
+            userName: "",
+            scrollPosition: 0
         };
 
         function load() {
@@ -2093,8 +2111,44 @@
 
         function getProgress(id) {
             var badge = BADGES[id];
-            if (!badge) return { done: 0, total: 0, pct: 0 };
+            if (!badge) return { done: 0, total: 0, pct: 0, mandatoryDone: 0, mandatoryTotal: 0, optionsDone: 0,
+                optionsTotal: 0 };
 
+            // For badges with mandatory + choose
+            if (badge.mandatory && badge.options) {
+                var mandatoryTotal = badge.mandatory.length;
+                var mandatoryDone = 0;
+                for (var m = 0; m < mandatoryTotal; m++) {
+                    if (state.done[id + "-mandatory-" + m]) mandatoryDone++;
+                }
+
+                var optionsTotal = badge.options.length;
+                var optionsDone = 0;
+                for (var o = 0; o < optionsTotal; o++) {
+                    if (state.done[id + "-option-" + o]) optionsDone++;
+                }
+
+                var requiredOptions = badge.choose || 3;
+                var optionsComplete = Math.min(optionsDone, requiredOptions);
+                var total = mandatoryTotal + requiredOptions;
+                var done = mandatoryDone + optionsComplete;
+
+                // Special case: if all mandatory done and at least required options done
+                var isComplete = (mandatoryDone === mandatoryTotal) && (optionsDone >= requiredOptions);
+
+                return {
+                    done: done,
+                    total: total,
+                    pct: total > 0 ? Math.round((done / total) * 100) : 0,
+                    mandatoryDone: mandatoryDone,
+                    mandatoryTotal: mandatoryTotal,
+                    optionsDone: optionsDone,
+                    optionsTotal: optionsTotal,
+                    isComplete: isComplete
+                };
+            }
+
+            // For staged badges
             if (badge.isStaged && badge.stages) {
                 var totalDone = 0;
                 var totalReqs = 0;
@@ -2111,12 +2165,14 @@
                 return { done: totalDone, total: totalReqs, pct: pct };
             }
 
-            var total = badge.reqs.length;
+            // For regular badges
+            var total = badge.reqs ? badge.reqs.length : 0;
             var done = 0;
             for (var i = 0; i < total; i++) {
                 if (state.done[id + "-" + i]) done++;
             }
-            return { done: done, total: total, pct: total > 0 ? Math.round((done / total) * 100) : 0 };
+            var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            return { done: done, total: total, pct: pct };
         }
 
         function getStageProgress(id, stageKey) {
@@ -2134,6 +2190,14 @@
         function getStatusText(id) {
             var badge = BADGES[id];
             if (!badge) return "Not Started";
+
+            // For mandatory + choose badges
+            if (badge.mandatory && badge.options) {
+                var p = getProgress(id);
+                if (p.isComplete) return "Complete";
+                if (p.done > 0) return "In Progress";
+                return "Not Started";
+            }
 
             // For "choose" badges (e.g., 3 of 5)
             if (badge.choose && badge.totalOptions) {
@@ -2362,13 +2426,11 @@
                     save();
                 });
                 nameInput.addEventListener("blur", function() {
-                    // Just save on blur
                     save();
                 });
                 nameInput.addEventListener("keydown", function(e) {
                     if (e.key === "Enter") {
                         this.blur();
-                        // Try to dismiss keyboard
                         document.activeElement && document.activeElement.blur();
                     }
                 });
@@ -2405,6 +2467,9 @@
         // ============================================================
 
         function openModal(id) {
+            // Save scroll position before opening
+            state.scrollPosition = window.scrollY;
+
             var b = BADGES[id];
             if (!b) return;
             state.current = id;
@@ -2429,32 +2494,81 @@
             favBtn.className = "modal-fav-btn" + (fav ? " active" : "");
 
             document.getElementById("stageSelector").style.display = "none";
-
-            var chooseHint = document.getElementById("chooseHint");
-            if (b.choose && b.totalOptions) {
-                chooseHint.style.display = "block";
-                chooseHint.textContent = "Choose " + b.choose + " of " + b.totalOptions + " activities below";
-            } else {
-                chooseHint.style.display = "none";
-            }
-
             document.getElementById("requirementsTitle").textContent = "Requirements";
 
-            var list = document.getElementById("modalRequirements");
-            var html = "";
-            for (var i = 0; i < b.reqs.length; i++) {
-                var key = id + "-" + i;
-                var done = !!state.done[key];
-                html += '<li>';
-                html += '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleReq(\'' + id + '\',' + i +
-                    ')" />';
-                html += '<span class="text' + (done ? ' done' : '') + '">' + b.reqs[i] + '</span>';
-                html += '</li>';
-            }
-            list.innerHTML = html;
+            var contentArea = document.getElementById("modalContentArea");
+            var html = '';
 
-            var p = getProgress(id);
-            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
+            // Check if this is a mandatory + choose badge
+            if (b.mandatory && b.options) {
+                var choose = b.choose || 3;
+
+                // Mandatory section
+                html += '<div class="mandatory-label">Mandatory:</div>';
+                html += '<ul>';
+                for (var m = 0; m < b.mandatory.length; m++) {
+                    var mKey = id + "-mandatory-" + m;
+                    var mDone = !!state.done[mKey];
+                    html += '<li>';
+                    html += '<input type="checkbox" ' + (mDone ? 'checked' : '') + ' onchange="toggleMandatory(\'' + id +
+                        '\',' + m + ')" />';
+                    html += '<span class="text' + (mDone ? ' done' : '') + '">' + b.mandatory[m] + '</span>';
+                    html += '</li>';
+                }
+                html += '</ul>';
+
+                // Options section
+                html += '<div class="choose-hint">Choose ' + choose + ' of ' + b.options.length +
+                ' activities below:</div>';
+                html += '<ul>';
+                for (var o = 0; o < b.options.length; o++) {
+                    var oKey = id + "-option-" + o;
+                    var oDone = !!state.done[oKey];
+                    html += '<li>';
+                    html += '<input type="checkbox" ' + (oDone ? 'checked' : '') + ' onchange="toggleOption(\'' + id +
+                        '\',' + o + ')" />';
+                    html += '<span class="text' + (oDone ? ' done' : '') + '">' + b.options[o] + '</span>';
+                    html += '</li>';
+                }
+                html += '</ul>';
+
+                var p = getProgress(id);
+                // Count how many mandatory are done
+                var mandatoryDone = 0;
+                for (var md = 0; md < b.mandatory.length; md++) {
+                    if (state.done[id + "-mandatory-" + md]) mandatoryDone++;
+                }
+                var optionsDone = 0;
+                for (var od = 0; od < b.options.length; od++) {
+                    if (state.done[id + "-option-" + od]) optionsDone++;
+                }
+                var required = b.choose || 3;
+                var progressDisplay = mandatoryDone + Math.min(optionsDone, required) + '/' + (b.mandatory.length +
+                    required);
+                document.getElementById("modalCount").textContent = progressDisplay + " complete";
+
+            } else if (b.reqs) {
+                // Regular badge with requirements
+                if (b.choose && b.totalOptions) {
+                    html += '<div class="choose-hint">Choose ' + b.choose + ' of ' + b.totalOptions +
+                        ' activities below:</div>';
+                }
+                html += '<ul>';
+                for (var i = 0; i < b.reqs.length; i++) {
+                    var key = id + "-" + i;
+                    var done = !!state.done[key];
+                    html += '<li>';
+                    html += '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleReq(\'' + id + '\',' +
+                        i + ')" />';
+                    html += '<span class="text' + (done ? ' done' : '') + '">' + b.reqs[i] + '</span>';
+                    html += '</li>';
+                }
+                html += '</ul>';
+                var p = getProgress(id);
+                document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
+            }
+
+            contentArea.innerHTML = html;
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
@@ -2475,10 +2589,9 @@
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
             document.getElementById("stageSelector").style.display = "none";
-            document.getElementById("chooseHint").style.display = "none";
             document.getElementById("requirementsTitle").textContent = "Select a Stage";
 
-            var list = document.getElementById("modalRequirements");
+            var contentArea = document.getElementById("modalContentArea");
             var html = '';
 
             for (var i = 0; i < stageKeys.length; i++) {
@@ -2497,7 +2610,7 @@
                 html += '</div>';
             }
 
-            list.innerHTML = html;
+            contentArea.innerHTML = html;
 
             var totalDone = 0;
             var totalReqs = 0;
@@ -2526,12 +2639,11 @@
             document.getElementById("modalCategory").textContent = catMap[b.cat] || b.cat;
 
             document.getElementById("stageSelector").style.display = "none";
-            document.getElementById("chooseHint").style.display = "none";
             document.getElementById("requirementsTitle").textContent = "Stage Requirements";
 
             var reqs = b.stages[stageKey];
-            var list = document.getElementById("modalRequirements");
-            var html = "";
+            var contentArea = document.getElementById("modalContentArea");
+            var html = '<ul>';
             for (var i = 0; i < reqs.length; i++) {
                 var key = id + "-" + stageKey + "-" + i;
                 var done = !!state.done[key];
@@ -2541,7 +2653,8 @@
                 html += '<span class="text' + (done ? ' done' : '') + '">' + reqs[i] + '</span>';
                 html += '</li>';
             }
-            list.innerHTML = html;
+            html += '</ul>';
+            contentArea.innerHTML = html;
 
             var sp = getStageProgress(id, stageKey);
             document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
@@ -2551,13 +2664,17 @@
         }
 
         function closeModal() {
-            if (state.modalView === 'stageDetail' && state.current) {
-                showStageList(state.current);
-                return;
-            }
-
+            // Restore scroll position when closing
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
+
+            // Restore scroll position after a tiny delay
+            setTimeout(function() {
+                if (state.scrollPosition > 0) {
+                    window.scrollTo(0, state.scrollPosition);
+                }
+            }, 10);
+
             state.current = null;
             state.modalView = null;
         }
@@ -2586,21 +2703,70 @@
             var key = id + "-" + index;
             state.done[key] = !state.done[key];
             save();
+            renderAll();
 
-            var p = getProgress(id);
-            document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
+            // Update modal count
+            var b = BADGES[id];
+            if (b && b.reqs) {
+                var p = getProgress(id);
+                document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
+                // Update checkbox styling
+                var items = document.querySelectorAll("#modalContentArea ul li");
+                if (items[index]) {
+                    var cb = items[index].querySelector('input[type="checkbox"]');
+                    var text = items[index].querySelector(".text");
+                    if (cb) cb.checked = !!state.done[key];
+                    if (text) {
+                        text.className = state.done[key] ? "text done" : "text";
+                    }
+                }
+            }
+        }
 
-            var items = document.querySelectorAll("#modalRequirements li");
-            if (items[index]) {
-                var cb = items[index].querySelector('input[type="checkbox"]');
-                var text = items[index].querySelector(".text");
+        function toggleMandatory(id, index) {
+            var key = id + "-mandatory-" + index;
+            state.done[key] = !state.done[key];
+            save();
+            renderAll();
+            updateModalProgress(id);
+        }
+
+        function toggleOption(id, index) {
+            var key = id + "-option-" + index;
+            state.done[key] = !state.done[key];
+            save();
+            renderAll();
+            updateModalProgress(id);
+        }
+
+        function updateModalProgress(id) {
+            var b = BADGES[id];
+            if (!b || !b.mandatory || !b.options) return;
+
+            var mandatoryDone = 0;
+            for (var md = 0; md < b.mandatory.length; md++) {
+                if (state.done[id + "-mandatory-" + md]) mandatoryDone++;
+            }
+            var optionsDone = 0;
+            for (var od = 0; od < b.options.length; od++) {
+                if (state.done[id + "-option-" + od]) optionsDone++;
+            }
+            var required = b.choose || 3;
+            var progressDisplay = mandatoryDone + Math.min(optionsDone, required) + '/' + (b.mandatory.length + required);
+            document.getElementById("modalCount").textContent = progressDisplay + " complete";
+
+            // Update checkbox styling
+            var items = document.querySelectorAll("#modalContentArea ul li");
+            for (var i = 0; i < items.length; i++) {
+                var cb = items[i].querySelector('input[type="checkbox"]');
+                var text = items[i].querySelector(".text");
+                // Find which key this li corresponds to
+                var key = id + "-" + (i < b.mandatory.length ? "mandatory-" + i : "option-" + (i - b.mandatory.length));
                 if (cb) cb.checked = !!state.done[key];
                 if (text) {
                     text.className = state.done[key] ? "text done" : "text";
                 }
             }
-
-            renderAll();
         }
 
         function toggleStageReq(id, stageKey, index) {
@@ -2611,7 +2777,7 @@
             var sp = getStageProgress(id, stageKey);
             document.getElementById("modalCount").textContent = sp.done + " / " + sp.total + " complete";
 
-            var items = document.querySelectorAll("#modalRequirements li");
+            var items = document.querySelectorAll("#modalContentArea ul li");
             if (items[index]) {
                 var cb = items[index].querySelector('input[type="checkbox"]');
                 var text = items[index].querySelector(".text");
@@ -2645,20 +2811,20 @@
                 } else {
                     showStageList(id);
                 }
+            } else if (b.mandatory && b.options) {
+                for (var m = 0; m < b.mandatory.length; m++) {
+                    delete state.done[id + "-mandatory-" + m];
+                }
+                for (var o = 0; o < b.options.length; o++) {
+                    delete state.done[id + "-option-" + o];
+                }
+                // Re-render the modal
+                openModal(id);
             } else {
                 for (var i = 0; i < b.reqs.length; i++) {
                     delete state.done[id + "-" + i];
                 }
-                var p = getProgress(id);
-                document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
-
-                var items = document.querySelectorAll("#modalRequirements li");
-                for (var j = 0; j < items.length; j++) {
-                    var cb = items[j].querySelector('input[type="checkbox"]');
-                    var text = items[j].querySelector(".text");
-                    if (cb) cb.checked = false;
-                    if (text) text.className = "text";
-                }
+                openModal(id);
             }
 
             save();
@@ -2694,6 +2860,8 @@
 
         document.querySelectorAll('.nav-item').forEach(function(item) {
             item.onclick = function() {
+                // Save scroll position before navigating
+                state.scrollPosition = window.scrollY;
                 navigateTo(this.dataset.page);
             };
         });
