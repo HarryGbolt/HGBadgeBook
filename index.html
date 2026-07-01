@@ -37,41 +37,39 @@
             letter-spacing: -0.5px;
         }
 
-        .badge-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 8px 12px 16px;
+        /* ===== BADGE LIST - One per row ===== */
+        .badge-list {
+            padding: 8px 16px 16px;
         }
 
         .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             background: white;
             border-radius: 16px;
-            padding: 14px 10px 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             cursor: pointer;
             transition: all 0.15s;
             border: 1px solid rgba(0, 0, 0, 0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            min-height: 160px;
-            justify-content: space-between;
+            min-height: 90px;
         }
         .badge-item:active {
-            transform: scale(0.96);
+            transform: scale(0.98);
+            background: #f8f8fc;
         }
         .badge-item .badge-image {
-            width: 72px;
-            height: 72px;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #f5f3ff;
             border-radius: 12px;
             overflow: hidden;
-            flex-shrink: 0;
         }
         .badge-item .badge-image img {
             width: 100%;
@@ -79,8 +77,12 @@
             object-fit: contain;
             padding: 6px;
         }
-        .badge-item .badge-name {
-            font-size: 13px;
+        .badge-item .badge-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .badge-item .badge-info .name {
+            font-size: 16px;
             font-weight: 600;
             color: #1a1a2e;
             display: -webkit-box;
@@ -89,16 +91,15 @@
             overflow: hidden;
             text-overflow: ellipsis;
             line-height: 1.3;
-            min-height: 34px;
-            margin-top: 4px;
         }
         .badge-item .badge-status {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 3px 12px;
+            padding: 4px 14px;
             border-radius: 12px;
-            margin-top: 4px;
-            min-width: 60px;
+            flex-shrink: 0;
+            text-align: center;
+            min-width: 80px;
         }
         .badge-item .badge-status.not-started {
             background: #f0f0f5;
@@ -120,18 +121,11 @@
             color: #1a1a2e;
             background: #f2f4f8;
         }
-        .section-header .count {
-            font-size: 13px;
-            font-weight: 500;
-            color: #888;
-            margin-left: 8px;
-        }
 
         .empty {
             text-align: center;
             padding: 40px 20px;
             color: #999;
-            grid-column: 1 / -1;
         }
         .empty .big {
             font-size: 48px;
@@ -411,27 +405,9 @@
             .modal-overlay {
                 align-items: center;
             }
-            .badge-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        @media (max-width: 400px) {
-            .badge-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 6px 8px 12px;
-            }
-            .badge-item {
-                min-height: 140px;
-                padding: 10px 8px 10px;
-            }
             .badge-item .badge-image {
-                width: 60px;
-                height: 60px;
-            }
-            .badge-item .badge-name {
-                font-size: 11px;
-                min-height: 28px;
+                width: 80px;
+                height: 80px;
             }
         }
 
@@ -505,6 +481,7 @@
             display: block;
         }
 
+        /* ===== PROFILE PAGE ===== */
         .profile-header {
             background: white;
             padding: 20px;
@@ -516,12 +493,25 @@
         .profile-header .avatar {
             font-size: 56px;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .profile-header .name {
             font-size: 20px;
             font-weight: 700;
             color: #1a1a2e;
+            border: none;
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+        }
+        .profile-header .name::placeholder {
+            color: #ccc;
+            font-weight: 400;
+        }
+        .profile-header .name:focus {
+            border-bottom: 2px solid #4a2c8a;
         }
         .profile-header .stats {
             display: flex;
@@ -551,38 +541,37 @@
             background: #f2f4f8;
         }
 
-        .profile-badge-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 8px 12px 16px;
+        .profile-badge-list {
+            padding: 0 16px 16px;
         }
 
         .profile-badge-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
             background: white;
             border-radius: 12px;
-            padding: 10px 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
             cursor: pointer;
             transition: all 0.15s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
             border: 1px solid #f0f0f5;
         }
         .profile-badge-item:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
+            background: #f8f8fc;
         }
         .profile-badge-item .pbi-image {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #f5f3ff;
             border-radius: 10px;
             overflow: hidden;
+            flex-shrink: 0;
         }
         .profile-badge-item .pbi-image img {
             width: 100%;
@@ -590,25 +579,30 @@
             object-fit: contain;
             padding: 4px;
         }
-        .profile-badge-item .pbi-name {
-            font-size: 11px;
+        .profile-badge-item .pbi-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .profile-badge-item .pbi-info .pbi-name {
+            font-size: 14px;
             font-weight: 600;
             color: #1a1a2e;
-            margin-top: 4px;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 1.2;
-            max-height: 26px;
+        }
+        .profile-badge-item .pbi-info .pbi-progress {
+            font-size: 12px;
+            color: #888;
         }
         .profile-badge-item .pbi-status {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 2px 8px;
+            padding: 2px 12px;
             border-radius: 10px;
-            margin-top: 3px;
+            flex-shrink: 0;
         }
         .profile-badge-item .pbi-status.complete {
             background: #e6f7e6;
@@ -618,31 +612,23 @@
             background: #e3f0ff;
             color: #4a2c8a;
         }
+        .profile-badge-item .pbi-status.not-started {
+            background: #f0f0f5;
+            color: #888;
+        }
 
         .profile-empty {
             text-align: center;
-            padding: 30px 20px;
+            padding: 20px;
             color: #999;
-            grid-column: 1 / -1;
         }
         .profile-empty .big {
-            font-size: 32px;
+            font-size: 28px;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .profile-empty p {
             font-size: 14px;
-        }
-
-        @media (max-width: 400px) {
-            .profile-badge-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (min-width: 600px) {
-            .profile-badge-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
     </style>
 </head>
@@ -2051,7 +2037,7 @@
             favourites: [],
             currentPage: "home",
             modalView: null,
-            scrollPosition: 0
+            userName: ""
         };
 
         function load() {
@@ -2062,6 +2048,7 @@
                     state.done = parsed.done || {};
                     state.currentStage = parsed.currentStage || "1";
                     state.favourites = parsed.favourites || [];
+                    state.userName = parsed.userName || "";
                 }
             } catch (e) {}
         }
@@ -2071,7 +2058,8 @@
                 localStorage.setItem("explorerTracker", JSON.stringify({
                     done: state.done,
                     currentStage: state.currentStage,
-                    favourites: state.favourites
+                    favourites: state.favourites,
+                    userName: state.userName
                 }));
             } catch (e) {}
         }
@@ -2150,6 +2138,7 @@
             var badge = BADGES[id];
             if (!badge) return "Not Started";
 
+            // For "choose" badges (e.g., 3 of 5)
             if (badge.choose && badge.totalOptions) {
                 var done = 0;
                 for (var i = 0; i < badge.reqs.length; i++) {
@@ -2160,11 +2149,13 @@
                 return "Not Started";
             }
 
+            // For staged badges
             if (badge.isStaged && badge.stages) {
                 var p = getProgress(id);
                 return getStatusTextFromPct(p.pct);
             }
 
+            // For regular badges (all requirements needed)
             var p = getProgress(id);
             return getStatusTextFromPct(p.pct);
         }
@@ -2198,22 +2189,6 @@
             });
         }
 
-        function getBadgeCounts() {
-            var total = 0,
-                completed = 0,
-                started = 0;
-            for (var id in BADGES) {
-                var b = BADGES[id];
-                var p = getProgress(id);
-                if (p.total > 0) {
-                    total++;
-                    if (p.pct === 100) completed++;
-                    else if (p.pct > 0) started++;
-                }
-            }
-            return { total: total, completed: completed, started: started };
-        }
-
         // ============================================================
         // RENDER
         // ============================================================
@@ -2240,9 +2215,8 @@
 
                 if (badgeIds.length === 0) continue;
 
-                html += '<div class="section-header">' + section.label + ' <span class="count">' + badgeIds.length +
-                    '</span></div>';
-                html += '<div class="badge-grid">';
+                html += '<div class="section-header">' + section.label + '</div>';
+                html += '<div class="badge-list">';
 
                 for (var i = 0; i < badgeIds.length; i++) {
                     var id = badgeIds[i];
@@ -2253,7 +2227,9 @@
 
                     html += '<div class="badge-item" data-id="' + id + '" onclick="openModal(\'' + id + '\')">';
                     html += '<div class="badge-image">' + getImageHtml(b) + '</div>';
-                    html += '<div class="badge-name">' + b.name + '</div>';
+                    html += '<div class="badge-info">';
+                    html += '<div class="name">' + b.name + '</div>';
+                    html += '</div>';
                     html += '<div class="badge-status ' + statusClass + '">' + statusText + '</div>';
                     html += '</div>';
                 }
@@ -2266,7 +2242,6 @@
 
         function renderProfile() {
             var container = document.getElementById("profileContainer");
-            var counts = getBadgeCounts();
 
             var allIds = Object.keys(BADGES);
             var completedIds = [];
@@ -2276,9 +2251,11 @@
             for (var i = 0; i < allIds.length; i++) {
                 var id = allIds[i];
                 var p = getProgress(id);
+                var status = getStatusText(id);
                 if (p.total > 0) {
-                    if (p.pct === 100) completedIds.push(id);
-                    else if (p.pct > 0) startedIds.push(id);
+                    if (status === "Complete") completedIds.push(id);
+                    else if (status === "In Progress") startedIds.push(id);
+                    else notStartedIds.push(id);
                 }
             }
 
@@ -2287,22 +2264,101 @@
             // Profile header
             html += '<div class="profile-header">';
             html += '<span class="avatar">👤</span>';
-            html += '<div class="name">Explorer</div>';
+            html += '<input class="name" id="userNameInput" type="text" placeholder="Your Name" value="' + state.userName +
+                '" />';
             html += '<div class="stats">';
-            html += '<div class="stat"><div class="num">' + counts.total + '</div><div class="label">Badges</div></div>';
-            html += '<div class="stat"><div class="num">' + counts.completed +
-                '</div><div class="label">Completed</div></div>';
-            html += '<div class="stat"><div class="num">' + counts.started + '</div><div class="label">In Progress</div></div>';
+            html += '<div class="stat"><div class="num">' + (completedIds.length + startedIds.length + notStartedIds
+                .length) + '</div><div class="label">Badges</div></div>';
+            html += '<div class="stat"><div class="num">' + completedIds.length + '</div><div class="label">Completed</div></div>';
+            html += '<div class="stat"><div class="num">' + startedIds.length + '</div><div class="label">In Progress</div></div>';
             html += '</div>';
             html += '</div>';
 
-            // Favourites section
+            // Not Started
+            html += '<div class="profile-section-title">⬜ Not Started</div>';
+            if (notStartedIds.length === 0) {
+                html += '<div class="profile-empty"><span class="big">🎉</span><p>All badges started or completed!</p></div>';
+            } else {
+                html += '<div class="profile-badge-list">';
+                for (var n = 0; n < notStartedIds.length && n < 20; n++) {
+                    var nid = notStartedIds[n];
+                    var nb = BADGES[nid];
+                    if (!nb) continue;
+                    html += '<div class="profile-badge-item" onclick="openModal(\'' + nid + '\')">';
+                    html += '<div class="pbi-image">' + getImageHtml(nb) + '</div>';
+                    html += '<div class="pbi-info">';
+                    html += '<div class="pbi-name">' + nb.name + '</div>';
+                    html += '<div class="pbi-progress">0/' + nb.reqs.length + '</div>';
+                    html += '</div>';
+                    html += '<div class="pbi-status not-started">Not Started</div>';
+                    html += '</div>';
+                }
+                if (notStartedIds.length > 20) {
+                    html += '<div class="profile-empty"><p>+ ' + (notStartedIds.length - 20) + ' more</p></div>';
+                }
+                html += '</div>';
+            }
+
+            // In Progress
+            html += '<div class="profile-section-title">⏳ In Progress</div>';
+            if (startedIds.length === 0) {
+                html += '<div class="profile-empty"><span class="big">⏳</span><p>No badges in progress</p></div>';
+            } else {
+                html += '<div class="profile-badge-list">';
+                for (var s = 0; s < startedIds.length && s < 20; s++) {
+                    var sid = startedIds[s];
+                    var sb = BADGES[sid];
+                    if (!sb) continue;
+                    var sp = getProgress(sid);
+                    var status = getStatusText(sid);
+                    var statusClass = getStatusClass(sp.pct);
+                    html += '<div class="profile-badge-item" onclick="openModal(\'' + sid + '\')">';
+                    html += '<div class="pbi-image">' + getImageHtml(sb) + '</div>';
+                    html += '<div class="pbi-info">';
+                    html += '<div class="pbi-name">' + sb.name + '</div>';
+                    html += '<div class="pbi-progress">' + sp.done + '/' + sp.total + '</div>';
+                    html += '</div>';
+                    html += '<div class="pbi-status ' + statusClass + '">' + status + '</div>';
+                    html += '</div>';
+                }
+                if (startedIds.length > 20) {
+                    html += '<div class="profile-empty"><p>+ ' + (startedIds.length - 20) + ' more</p></div>';
+                }
+                html += '</div>';
+            }
+
+            // Completed
+            html += '<div class="profile-section-title">✅ Completed</div>';
+            if (completedIds.length === 0) {
+                html += '<div class="profile-empty"><span class="big">✅</span><p>No badges completed yet</p></div>';
+            } else {
+                html += '<div class="profile-badge-list">';
+                for (var c = 0; c < completedIds.length && c < 20; c++) {
+                    var cid = completedIds[c];
+                    var cb = BADGES[cid];
+                    if (!cb) continue;
+                    html += '<div class="profile-badge-item" onclick="openModal(\'' + cid + '\')">';
+                    html += '<div class="pbi-image">' + getImageHtml(cb) + '</div>';
+                    html += '<div class="pbi-info">';
+                    html += '<div class="pbi-name">' + cb.name + '</div>';
+                    html += '<div class="pbi-progress">Complete</div>';
+                    html += '</div>';
+                    html += '<div class="pbi-status complete">Complete</div>';
+                    html += '</div>';
+                }
+                if (completedIds.length > 20) {
+                    html += '<div class="profile-empty"><p>+ ' + (completedIds.length - 20) + ' more</p></div>';
+                }
+                html += '</div>';
+            }
+
+            // Favourites
             html += '<div class="profile-section-title">⭐ Favourites</div>';
             if (state.favourites.length === 0) {
                 html += '<div class="profile-empty"><span class="big">⭐</span><p>No favourites yet</p></div>';
             } else {
-                html += '<div class="profile-badge-grid">';
-                for (var f = 0; f < state.favourites.length && f < 12; f++) {
+                html += '<div class="profile-badge-list">';
+                for (var f = 0; f < state.favourites.length && f < 20; f++) {
                     var fid = state.favourites[f];
                     var fb = BADGES[fid];
                     if (!fb) continue;
@@ -2311,66 +2367,34 @@
                     var fclass = getStatusClass(fp.pct);
                     html += '<div class="profile-badge-item" onclick="openModal(\'' + fid + '\')">';
                     html += '<div class="pbi-image">' + getImageHtml(fb) + '</div>';
+                    html += '<div class="pbi-info">';
                     html += '<div class="pbi-name">' + fb.name + '</div>';
+                    html += '<div class="pbi-progress">' + fp.done + '/' + fp.total + '</div>';
+                    html += '</div>';
                     html += '<div class="pbi-status ' + fclass + '">' + fstatus + '</div>';
                     html += '</div>';
                 }
-                if (state.favourites.length > 12) {
-                    html += '<div class="profile-empty" style="grid-column:1/-1;"><p>+ ' + (state.favourites.length - 12) +
-                        ' more</p></div>';
-                }
-                html += '</div>';
-            }
-
-            // Completed badges
-            html += '<div class="profile-section-title">✅ Completed</div>';
-            if (completedIds.length === 0) {
-                html += '<div class="profile-empty"><span class="big">✅</span><p>No badges completed yet</p></div>';
-            } else {
-                html += '<div class="profile-badge-grid">';
-                for (var c = 0; c < completedIds.length && c < 12; c++) {
-                    var cid = completedIds[c];
-                    var cb = BADGES[cid];
-                    if (!cb) continue;
-                    html += '<div class="profile-badge-item" onclick="openModal(\'' + cid + '\')">';
-                    html += '<div class="pbi-image">' + getImageHtml(cb) + '</div>';
-                    html += '<div class="pbi-name">' + cb.name + '</div>';
-                    html += '<div class="pbi-status complete">Complete</div>';
-                    html += '</div>';
-                }
-                if (completedIds.length > 12) {
-                    html += '<div class="profile-empty" style="grid-column:1/-1;"><p>+ ' + (completedIds.length - 12) +
-                        ' more</p></div>';
-                }
-                html += '</div>';
-            }
-
-            // In Progress badges
-            html += '<div class="profile-section-title">⏳ In Progress</div>';
-            if (startedIds.length === 0) {
-                html += '<div class="profile-empty"><span class="big">⏳</span><p>No badges in progress</p></div>';
-            } else {
-                html += '<div class="profile-badge-grid">';
-                for (var s = 0; s < startedIds.length && s < 12; s++) {
-                    var sid = startedIds[s];
-                    var sb = BADGES[sid];
-                    if (!sb) continue;
-                    var sp = getProgress(sid);
-                    var sstatus = getStatusText(sid);
-                    html += '<div class="profile-badge-item" onclick="openModal(\'' + sid + '\')">';
-                    html += '<div class="pbi-image">' + getImageHtml(sb) + '</div>';
-                    html += '<div class="pbi-name">' + sb.name + '</div>';
-                    html += '<div class="pbi-status in-progress">' + sp.done + '/' + sp.total + '</div>';
-                    html += '</div>';
-                }
-                if (startedIds.length > 12) {
-                    html += '<div class="profile-empty" style="grid-column:1/-1;"><p>+ ' + (startedIds.length - 12) +
-                        ' more</p></div>';
+                if (state.favourites.length > 20) {
+                    html += '<div class="profile-empty"><p>+ ' + (state.favourites.length - 20) + ' more</p></div>';
                 }
                 html += '</div>';
             }
 
             container.innerHTML = html;
+
+            // Bind name input event
+            var nameInput = document.getElementById("userNameInput");
+            if (nameInput) {
+                nameInput.addEventListener("input", function() {
+                    state.userName = this.value;
+                    save();
+                    // Update the greeting if we had one
+                });
+                // Show placeholder when empty
+                if (!state.userName) {
+                    nameInput.placeholder = "Your Name";
+                }
+            }
         }
 
         // ============================================================
@@ -2400,8 +2424,6 @@
         // ============================================================
 
         function openModal(id) {
-            state.scrollPosition = window.scrollY;
-
             var b = BADGES[id];
             if (!b) return;
             state.current = id;
