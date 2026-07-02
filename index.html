@@ -271,6 +271,8 @@
             display: flex;
             flex-direction: column;
             touch-action: none;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
         @keyframes fadeIn {
             from {
@@ -805,6 +807,8 @@
             scrollPosition: 0
         };
 
+        var modalHistory = [];
+
         // ============================================================
         // LOAD BADGE DATA — Works everywhere (GitHub Pages, local, phone)
         // ============================================================
@@ -822,9 +826,7 @@
 
             var GIST_URL = BADGES_URL;
 
-            // Try multiple methods to load the data
             var methods = [
-                // Method 1: Direct fetch (works on GitHub Pages)
                 function(callback) {
                     fetch(GIST_URL, { cache: 'no-cache' })
                         .then(function(r) { 
@@ -834,7 +836,6 @@
                         .then(function(data) { callback(null, data); })
                         .catch(function(err) { callback(err, null); });
                 },
-                // Method 2: Fetch with no-cors (sometimes works on phones)
                 function(callback) {
                     fetch(GIST_URL, { 
                         cache: 'no-cache',
@@ -851,7 +852,6 @@
                         })
                         .catch(function(err) { callback(err, null); });
                 },
-                // Method 3: XMLHttpRequest (old school, works everywhere)
                 function(callback) {
                     var xhr = new XMLHttpRequest();
                     xhr.open('GET', GIST_URL, true);
@@ -872,7 +872,6 @@
                     xhr.ontimeout = function() { callback(new Error('Timeout'), null); };
                     xhr.send();
                 },
-                // Method 4: Use a CORS proxy (last resort for local files)
                 function(callback) {
                     var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(GIST_URL);
                     fetch(proxyUrl, { cache: 'no-cache' })
@@ -889,7 +888,6 @@
 
             function tryNextMethod() {
                 if (currentMethod >= methods.length) {
-                    // All methods failed
                     console.error('❌ All load methods failed');
                     loading.style.display = 'none';
                     error.style.display = 'block';
@@ -908,7 +906,6 @@
                         return;
                     }
 
-                    // Success!
                     console.log('✅ Badges loaded!', Object.keys(data).length, 'badges');
                     BADGES = data;
                     loading.style.display = 'none';
@@ -1322,7 +1319,7 @@
         }
 
         // ============================================================
-        // MODAL
+        // MODAL — With proper back navigation handling
         // ============================================================
 
         function openModal(id) {
@@ -1331,6 +1328,8 @@
             var b = BADGES[id];
             if (!b) return;
             state.current = id;
+
+            modalHistory.push({ view: 'detail', id: id });
 
             if (b.isStaged && b.stages) {
                 state.modalView = 'stageList';
@@ -1387,7 +1386,6 @@
                 }
                 html += '</ul>';
 
-                var p = getProgress(id);
                 var mandatoryDone = 0;
                 for (var md = 0; md < b.mandatory.length; md++) {
                     if (state.done[id + "-mandatory-" + md]) mandatoryDone++;
@@ -1425,6 +1423,8 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
+            
+            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function showStageList(id) {
@@ -1434,6 +1434,8 @@
             state.modalView = 'stageList';
             state.current = id;
             var stageKeys = b.stageList || Object.keys(b.stages);
+
+            modalHistory.push({ view: 'stageList', id: id });
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
             document.getElementById("modalTitle").textContent = b.name;
@@ -1476,6 +1478,8 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
+            
+            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function openStage(id, stageKey) {
@@ -1484,6 +1488,8 @@
             state.current = id;
             state.currentStage = stageKey;
             state.modalView = 'stageDetail';
+
+            modalHistory.push({ view: 'stageDetail', id: id, stage: stageKey });
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
             document.getElementById("modalTitle").textContent = b.name + " - Stage " + stageKey;
@@ -1514,9 +1520,13 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
+            
+            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function closeModal() {
+            modalHistory = [];
+            
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
 
@@ -1528,23 +1538,46 @@
 
             state.current = null;
             state.modalView = null;
+            
+            if (history.state && history.state.modalOpen) {
+                history.back();
+            }
         }
 
         function goBack() {
             if (document.getElementById("modalOverlay").className === "modal-overlay show") {
-                if (state.modalView === 'stageDetail' && state.current) {
-                    showStageList(state.current);
-                    return true;
-                }
-                if (state.modalView === 'stageList') {
+                modalHistory.pop();
+                
+                var prev = modalHistory[modalHistory.length - 1];
+                
+                if (!prev) {
                     closeModal();
                     return true;
                 }
-                closeModal();
+                
+                if (prev.view === 'stageList') {
+                    showStageList(prev.id);
+                } else if (prev.view === 'stageDetail') {
+                    openStage(prev.id, prev.stage);
+                } else if (prev.view === 'detail') {
+                    openModal(prev.id);
+                }
+                
+                if (history.state && history.state.modalOpen) {
+                    history.back();
+                }
+                
                 return true;
             }
             return false;
         }
+
+        // Handle browser back button
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.modalOpen) {
+                goBack();
+            }
+        });
 
         // ============================================================
         // TOGGLE FUNCTIONS
@@ -1716,9 +1749,8 @@
         };
 
         window.addEventListener('popstate', function(e) {
-            if (goBack()) {
-                e.preventDefault();
-                history.pushState(null, null, window.location.href);
+            if (e.state && e.state.modalOpen) {
+                goBack();
             }
         });
 
@@ -1736,7 +1768,6 @@
         // BOOT
         // ============================================================
 
-        // Load badge data from Gist
         loadBadgeData();
 
         console.log("🏕️ Explorer Badge Tracker loaded!");
