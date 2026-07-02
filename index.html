@@ -270,6 +270,7 @@
             border-radius: 0;
             display: flex;
             flex-direction: column;
+            touch-action: none;
         }
         @keyframes fadeIn {
             from {
@@ -776,10 +777,9 @@
 
     <script>
         // ============================================================
-        // CONFIGURATION
+        // CONFIGURATION — Your Gist URL only (the code handles the rest)
         // ============================================================
 
-        // 🔧 CHANGE THIS URL to your Gist raw URL
         var BADGES_URL = 'https://gist.githubusercontent.com/HarryGbolt/43e763448693b9efd47e58c1f5d62693/raw/f29751a29e7b789019af12b594c10e10134442b1/badges.json';
 
         // ============================================================
@@ -806,7 +806,7 @@
         };
 
         // ============================================================
-        // LOAD BADGE DATA
+        // LOAD BADGE DATA — Works everywhere (GitHub Pages, local, phone)
         // ============================================================
 
         function loadBadgeData() {
@@ -818,31 +818,109 @@
             loading.style.display = 'block';
             error.style.display = 'none';
             main.style.display = 'none';
-            refreshBtn.classList.add('loading');
+            if (refreshBtn) refreshBtn.classList.add('loading');
 
-            fetch(BADGES_URL, {
-                cache: 'no-cache',
-                headers: { 'Cache-Control': 'no-cache' }
-            })
-            .then(function(response) {
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                return response.json();
-            })
-            .then(function(data) {
-                BADGES = data;
-                loading.style.display = 'none';
-                main.style.display = 'block';
-                refreshBtn.classList.remove('loading');
-                load();
-                navigateTo(state.currentPage || 'home');
-                console.log('✅ Badges loaded!', Object.keys(BADGES).length + ' badges');
-            })
-            .catch(function(err) {
-                console.error('Failed to load badges:', err);
-                loading.style.display = 'none';
-                error.style.display = 'block';
-                refreshBtn.classList.remove('loading');
-            });
+            var GIST_URL = BADGES_URL;
+
+            // Try multiple methods to load the data
+            var methods = [
+                // Method 1: Direct fetch (works on GitHub Pages)
+                function(callback) {
+                    fetch(GIST_URL, { cache: 'no-cache' })
+                        .then(function(r) { 
+                            if (!r.ok) throw new Error('HTTP ' + r.status); 
+                            return r.json(); 
+                        })
+                        .then(function(data) { callback(null, data); })
+                        .catch(function(err) { callback(err, null); });
+                },
+                // Method 2: Fetch with no-cors (sometimes works on phones)
+                function(callback) {
+                    fetch(GIST_URL, { 
+                        cache: 'no-cache',
+                        mode: 'no-cors'
+                    })
+                        .then(function(r) { return r.text(); })
+                        .then(function(text) {
+                            try {
+                                var data = JSON.parse(text);
+                                callback(null, data);
+                            } catch(e) {
+                                callback(e, null);
+                            }
+                        })
+                        .catch(function(err) { callback(err, null); });
+                },
+                // Method 3: XMLHttpRequest (old school, works everywhere)
+                function(callback) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', GIST_URL, true);
+                    xhr.timeout = 10000;
+                    xhr.onload = function() {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                callback(null, data);
+                            } catch(e) {
+                                callback(e, null);
+                            }
+                        } else {
+                            callback(new Error('HTTP ' + xhr.status), null);
+                        }
+                    };
+                    xhr.onerror = function() { callback(new Error('Network error'), null); };
+                    xhr.ontimeout = function() { callback(new Error('Timeout'), null); };
+                    xhr.send();
+                },
+                // Method 4: Use a CORS proxy (last resort for local files)
+                function(callback) {
+                    var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(GIST_URL);
+                    fetch(proxyUrl, { cache: 'no-cache' })
+                        .then(function(r) {
+                            if (!r.ok) throw new Error('HTTP ' + r.status);
+                            return r.json();
+                        })
+                        .then(function(data) { callback(null, data); })
+                        .catch(function(err) { callback(err, null); });
+                }
+            ];
+
+            var currentMethod = 0;
+
+            function tryNextMethod() {
+                if (currentMethod >= methods.length) {
+                    // All methods failed
+                    console.error('❌ All load methods failed');
+                    loading.style.display = 'none';
+                    error.style.display = 'block';
+                    if (refreshBtn) refreshBtn.classList.remove('loading');
+                    return;
+                }
+
+                console.log('🔁 Trying method', currentMethod + 1, 'of', methods.length);
+                var method = methods[currentMethod];
+                currentMethod++;
+
+                method(function(err, data) {
+                    if (err) {
+                        console.warn('⚠️ Method failed:', err.message);
+                        tryNextMethod();
+                        return;
+                    }
+
+                    // Success!
+                    console.log('✅ Badges loaded!', Object.keys(data).length, 'badges');
+                    BADGES = data;
+                    loading.style.display = 'none';
+                    main.style.display = 'block';
+                    if (refreshBtn) refreshBtn.classList.remove('loading');
+                    load();
+                    navigateTo(state.currentPage || 'home');
+                    renderAll();
+                });
+            }
+
+            tryNextMethod();
         }
 
         // ============================================================
@@ -908,7 +986,6 @@
             if (!badge) return { done: 0, total: 0, pct: 0, mandatoryDone: 0, mandatoryTotal: 0, optionsDone: 0,
                 optionsTotal: 0 };
 
-            // For badges with mandatory + choose
             if (badge.mandatory && badge.options) {
                 var mandatoryTotal = badge.mandatory.length;
                 var mandatoryDone = 0;
@@ -941,7 +1018,6 @@
                 };
             }
 
-            // For staged badges
             if (badge.isStaged && badge.stages) {
                 var totalDone = 0;
                 var totalReqs = 0;
@@ -958,7 +1034,6 @@
                 return { done: totalDone, total: totalReqs, pct: pct };
             }
 
-            // For regular badges
             var total = badge.reqs ? badge.reqs.length : 0;
             var done = 0;
             for (var i = 0; i < total; i++) {
@@ -1665,7 +1740,7 @@
         loadBadgeData();
 
         console.log("🏕️ Explorer Badge Tracker loaded!");
-        console.log("📊 Data source:", BADGES_URL);
+        console.log("📡 Data source:", BADGES_URL);
     </script>
 </body>
 </html>
