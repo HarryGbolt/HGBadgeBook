@@ -1319,7 +1319,7 @@
         }
 
         // ============================================================
-        // MODAL — With proper back navigation handling
+        // MODAL — Simple and working
         // ============================================================
 
         function openModal(id) {
@@ -1328,8 +1328,6 @@
             var b = BADGES[id];
             if (!b) return;
             state.current = id;
-
-            modalHistory.push({ view: 'detail', id: id });
 
             if (b.isStaged && b.stages) {
                 state.modalView = 'stageList';
@@ -1423,8 +1421,6 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
-            
-            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function showStageList(id) {
@@ -1434,8 +1430,6 @@
             state.modalView = 'stageList';
             state.current = id;
             var stageKeys = b.stageList || Object.keys(b.stages);
-
-            modalHistory.push({ view: 'stageList', id: id });
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
             document.getElementById("modalTitle").textContent = b.name;
@@ -1478,8 +1472,6 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
-            
-            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function openStage(id, stageKey) {
@@ -1488,8 +1480,6 @@
             state.current = id;
             state.currentStage = stageKey;
             state.modalView = 'stageDetail';
-
-            modalHistory.push({ view: 'stageDetail', id: id, stage: stageKey });
 
             document.getElementById("modalIcon").innerHTML = getImageHtml(b);
             document.getElementById("modalTitle").textContent = b.name + " - Stage " + stageKey;
@@ -1520,13 +1510,9 @@
 
             document.getElementById("modalOverlay").className = "modal-overlay show";
             document.body.style.overflow = "hidden";
-            
-            history.pushState({ modalOpen: true }, '', window.location.href);
         }
 
         function closeModal() {
-            modalHistory = [];
-            
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
 
@@ -1538,35 +1524,25 @@
 
             state.current = null;
             state.modalView = null;
-            
-            if (history.state && history.state.modalOpen) {
-                history.back();
-            }
         }
 
         function goBack() {
             if (document.getElementById("modalOverlay").className === "modal-overlay show") {
-                modalHistory.pop();
-                
-                var prev = modalHistory[modalHistory.length - 1];
-                
-                if (!prev) {
+                if (state.modalView === 'stageDetail' && state.current) {
+                    // Go back to stage list
+                    var b = BADGES[state.current];
+                    if (b && b.isStaged) {
+                        showStageList(state.current);
+                        return true;
+                    }
+                }
+                if (state.modalView === 'stageList' || state.modalView === 'detail') {
+                    // Close the modal
                     closeModal();
                     return true;
                 }
-                
-                if (prev.view === 'stageList') {
-                    showStageList(prev.id);
-                } else if (prev.view === 'stageDetail') {
-                    openStage(prev.id, prev.stage);
-                } else if (prev.view === 'detail') {
-                    openModal(prev.id);
-                }
-                
-                if (history.state && history.state.modalOpen) {
-                    history.back();
-                }
-                
+                // Fallback: just close it
+                closeModal();
                 return true;
             }
             return false;
@@ -1574,10 +1550,21 @@
 
         // Handle browser back button
         window.addEventListener('popstate', function(e) {
-            if (e.state && e.state.modalOpen) {
+            // Don't interfere with the app's navigation
+            // Just let the browser do its thing
+        });
+
+        // Override the modal close button to use goBack
+        document.getElementById("modalClose").onclick = function() {
+            goBack();
+        };
+
+        // Click outside modal to close
+        document.getElementById("modalOverlay").onclick = function(e) {
+            if (e.target === this) {
                 goBack();
             }
-        });
+        };
 
         // ============================================================
         // TOGGLE FUNCTIONS
