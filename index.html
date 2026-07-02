@@ -40,11 +40,59 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         .header-top h1 {
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.5px;
+        }
+        .header-top .refresh-btn {
+            position: absolute;
+            right: 0;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .header-top .refresh-btn:active {
+            background: rgba(255,255,255,0.15);
+        }
+        .header-top .refresh-btn.loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .loading-state .spinner {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            animation: spin 1.5s linear infinite;
+        }
+        .loading-state .error {
+            color: #e74c3c;
+        }
+        .loading-state .retry-btn {
+            margin-top: 16px;
+            background: #4a2c8a;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .badge-list {
@@ -655,15 +703,34 @@
     <div class="header">
         <div class="header-top">
             <h1>Explorer Badge Tracker</h1>
+            <button class="refresh-btn" id="refreshBtn" title="Refresh badge data">🔄</button>
         </div>
     </div>
 
-    <div class="page active" id="pageHome">
-        <div id="badgeContainer"></div>
-    </div>
+    <div id="appContent">
+        <!-- Loading state -->
+        <div id="loadingState" class="loading-state">
+            <span class="spinner">⏳</span>
+            <p>Loading badge data...</p>
+        </div>
 
-    <div class="page" id="pageProfile">
-        <div id="profileContainer"></div>
+        <!-- Error state -->
+        <div id="errorState" class="loading-state" style="display:none;">
+            <span class="spinner error">⚠️</span>
+            <p class="error">Failed to load badge data</p>
+            <button class="retry-btn" onclick="loadBadgeData()">Retry</button>
+        </div>
+
+        <!-- Main app -->
+        <div id="mainApp" style="display:none;">
+            <div class="page active" id="pageHome">
+                <div id="badgeContainer"></div>
+            </div>
+
+            <div class="page" id="pageProfile">
+                <div id="profileContainer"></div>
+            </div>
+        </div>
     </div>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -709,1350 +776,23 @@
 
     <script>
         // ============================================================
-        // DATA — All Badges (58 total)
+        // CONFIGURATION
         // ============================================================
 
-        var BADGES = {
-
-            // =========================================================
-            // ACTIVITY BADGES (32)
-            // =========================================================
-
-            "action-sports": {
-                name: "Action Sports",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/uhcf2wnp/activitybadge_ex_action-sports_rgb.png",
-                mandatory: [
-                    "Take part in at least one session of an Action Sport of your choice. Ensure that supervision is provided by an appropriately qualified person if your action sport requires one."
-                ],
-                options: [
-                    "Discover - Find out how an action sport has changed since it's invention. Look at the technology used and how it's image has changed.",
-                    "Experience - Take part in an action sport. Learn the skills required for the activity, any equipment used, and how to keep yourself safe.",
-                    "Mobilise - Find out about action sport opportunities in your community. What can you do to help a community sports club? Work with them on one of their development targets.",
-                    "Solve - Plan a trip to take part in an action sport of your choice. Think about how you'll get there, what costs are involved and what kit you'll need.",
-                    "Create - Create a new piece of equipment or accessory that can be used for an action sport of your choice."
-                ],
-                choose: 3
-            },
-            "athletics": {
-                name: "Athletics",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/xpjeykyc/activitybadge_ex_athletics_rgb.png",
-                reqs: [
-                    "Discover - Look into the science behind how athletes improve their speed or strength. Can you put some into practice as a group?",
-                    "Experience - Try out a new athletic discipline, like long jump or shot put, and see how you do. Consider the safety rules and how you could apply these across disciplines.",
-                    "Mobilise - Take part in a community athletics activity, either marshalling or participating. You could have a go at your local park run, or volunteer as a marshal.",
-                    "Solve - Create a plan to beat your personal best in an activity, whether it's running, jumping, or throwing, and track how you improve over time.",
-                    "Create - Organise and run an athletics event for your District, County or Region. You could organise a venue, plan and lead activities and invite other groups to join."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "camper": {
-                name: "Camper",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/ho1fqdjz/activitybadge_ex_camper_with-cologo_rgb.png",
-                mandatory: [
-                    "Camp outdoors for a total of seven nights across two events or more as an Explorer, including at least three nights as part of this badge."
-                ],
-                options: [
-                    "Discover - Investigate how camping equipment has changed in the past 20-40 years. Focus on one area which interests you.",
-                    "Experience - Use three different types of camping stove to cook a meal. Think about which stove works best and explore how to keep yourself, others, and the environment safe.",
-                    "Mobilise - Help your local campsite to plan and implement one way they can be more inclusive and accessible.",
-                    "Solve - Plan, budget and execute a camp. You should include activities, a menu and appropriate risk assessments for your Unit.",
-                    "Create - Design a local campsite directory, campfire songbook or camp recipe book which could be used by anyone in your group."
-                ],
-                choose: 3
-            },
-            "caving": {
-                name: "Caving",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/k50l5tge/activitybadge_ex_caving_rgb.png",
-                mandatory: [
-                    "Take part in at least one caving trip as part of completing this badge. Make sure your trip is supervised by an appropriately qualified person."
-                ],
-                options: [
-                    "Discover - Find out how caves are formed. This might be a cave system local to you or a famous cave system. Understand and explain how it was formed.",
-                    "Experience - Take part in a caving trip. It's important to make sure you do it safely, with a properly led group and relevant qualifications or safety permits in place.",
-                    "Mobilise - Find out about our responsibilities when caving. This might include cave conservation, safety systems or access rights to caves.",
-                    "Solve - Learn how to set up a prussik line for vertical caving and have a go at using it. It's a good idea to have someone experienced and qualified check it's right.",
-                    "Create - Create a model cave system showing the reasons that the system formed. It could be based on a cave system that you have visited."
-                ],
-                choose: 3
-            },
-            "chef": {
-                name: "Chef",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/youpgydq/activitybadge_ex_chef_rgb.png",
-                reqs: [
-                    "Discover - Choose a recipe, a cooking technique or a traditional food, and find out about its history. Have a go at making something using traditional methods and ingredients.",
-                    "Experience - Hold a cooking competition with your Unit or District.",
-                    "Mobilise - Look at the social issues that surround our food production, and see if you can take any actions to reduce their impact.",
-                    "Solve - Plan a recipe or menu that you would make in your usual kitchen facilities. Then, try and make that using a different cooking facility (e.g. camping stoves or campfire).",
-                    "Create - Create a menu for a specific event. This could be anything from a gala style dinner, or a street food tasting night! Build your budget and shopping list and design the menu."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "climber": {
-                name: "Climber",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/j52dlila/activitybadge_ex_climber_rgb.png",
-                mandatory: [
-                    "Take part in at least two sessions of climbing, indoor or out, while completing this badge. Make sure your session is supervised by an appropriately qualified person."
-                ],
-                options: [
-                    "Discover - Find out about the history of Climbing in the UK. Consider how the sport, equipment and access has evolved over the years.",
-                    "Experience - Take part in two different types of climbing and find out about how these climbs are graded and recorded.",
-                    "Mobilise - Consider accessibility within climbing - how it could be more accessible and encourage more people into the sport.",
-                    "Solve - Look at different safety equipment, discover and discuss how we use it and what each item does. Work out why equipment does not work when it's not used properly.",
-                    "Create - Create a guidebook entry for a climb you've done. Consider the information other climbers would need."
-                ],
-                choose: 3
-            },
-            "coach": {
-                name: "Coach",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/oebhs0t0/activitybadge_ex_instructor_a_rgb.png",
-                reqs: [
-                    "Discover - Learn about different coaching techniques, like how to break down skills or keep a group motivated. Demonstrate these to your Unit.",
-                    "Experience - Run a session to coach a group in a new skill that will help them work towards or achieve the badge that you're supporting. Evaluate how you've instructed afterwards.",
-                    "Mobilise - Plan, organise and deliver a workshop to a group outside of your Unit. This could be a different section, or a Unit elsewhere in your area.",
-                    "Solve - Come up with a creative way to explain a tricky concept, like using props or games to make it easier to understand. Test them out on a group.",
-                    "Create - Design a session plan or tip sheet describing how you would teach or instruct a specific skill or activity. Test out your plan to see if it helps others learn."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "communication": {
-                name: "Communication",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/rxxc0ezv/activitybadge_ex_communication_rgb.png",
-                reqs: [
-                    "Discover - Find out about digital footprints. Research yourself online and find out what information someone could find out about you if they tried.",
-                    "Experience - Learn a new way of communicating. Learn some phrases and words in either a new language, sign language or by exploring non-verbal ways of communicating.",
-                    "Mobilise - Look at how charities talk about Mental Health. Create and share a way to encourage open conversations about feelings.",
-                    "Solve - Research the issues around social media and digital communication. Think about the pros and cons of different platforms.",
-                    "Create - Create a method of communicating. Think big – this could be from building a machine to help communicate, or designing a method of communication to help in one of your activities."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "content-creation": {
-                name: "Content Creation",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/reqbj5pz/activitybadge_ex_content_creation_rgb.png",
-                reqs: [
-                    "Discover - Explore how digital content can shape opinions, build communities, and influence change. Learn about ethical storytelling and audience responsibility.",
-                    "Experience - Create a piece of content that aims to positively influence your community or raise awareness of an issue.",
-                    "Mobilise - Collaborate with your District or County to design a digital campaign that supports recruitment or community engagement.",
-                    "Solve - Investigate how to make digital content inclusive and accessible, then teach others what you've learned.",
-                    "Create - Develop a digital storytelling project that includes diverse voices and perspectives from across Scouting."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "creative-arts": {
-                name: "Creative Arts",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/kj3cn2i4/activitybadge_ex_creative_arts_rgb.png",
-                reqs: [
-                    "Discover - Find out about an artist, craftsperson or arts organisation and their work. What or who inspired them? How did they get started?",
-                    "Experience - Learn a new creative skill. This could cover art, performing arts, dance, photography or music.",
-                    "Mobilise - Find out what opportunities there are around your local area for you or your Unit to get involved in the Arts.",
-                    "Solve - Create a piece of art using a non-traditional medium or an innovative way of working.",
-                    "Create - Explore an avenue or medium of your choice and create a piece of work that reflects you as a person."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "democracy": {
-                name: "Democracy",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/bpsb1ntb/activitybadge_ex_democracy_rgb.png",
-                reqs: [
-                    "Discover - Explore the history of democracy in your country. This could include how it works, people's rights, who could vote, and how people have influenced decisions.",
-                    "Experience - Attend, take part in, or meet representatives from a local youth voice or democratic forum.",
-                    "Mobilise - Gather evidence from other young people about a local issue and how it could be addressed, then share your findings with a local decision-maker.",
-                    "Solve - Develop a way to improve how young people's voices are heard on issues that affect them.",
-                    "Create - Design a simple way to help others understand democracy. This could include how people can take part and why participation matters."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "employability-skills": {
-                name: "Employability Skills",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4tapvf0m/activitybadge_ex_employability_skills_rgb.png",
-                reqs: [
-                    "Discover - Research the transferrable soft skills that Employers look for. Identify how your time in Explorers may contribute to these skills.",
-                    "Experience - Build some mock interviews for another person in your Unit. Have a go at both interviewing and being interviewed.",
-                    "Mobilise - Get in touch with some local employers and businesses in your area, and ask them to run some employability sessions.",
-                    "Solve - Set up some scenarios or simulations of conflicts you may face and implement some conflict resolution skills.",
-                    "Create - Create your CV through a medium not usually seen in job applications. This could be a fun video, a presentation, or a song."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "exploration": {
-                name: "Exploration",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/3imhuezd/activitybadge_ex_exploration_rgb.png",
-                reqs: [
-                    "Discover - Investigate the life and impact of an explorer. Choose a historical or contemporary explorer and research their journey and impact.",
-                    "Experience - Navigate and document an unfamiliar area. Create a detailed field journal or digital map that includes observations of natural features and local culture.",
-                    "Mobilise - Advocate for access to outdoor spaces. Research Public Rights of Way in your area and investigate any current issues or campaigns.",
-                    "Solve - Design a detailed plan for an expedition to a remote or hard-to-reach location. Include transport, safety, equipment, budgeting, and team roles.",
-                    "Create - While out exploring an area, gather meaningful items, images, or sounds. Use them to produce something that communicates your experience."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "fundraising": {
-                name: "Fundraising",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/bvcg03ky/activitybadge_ex_fundraising_rgb.png",
-                reqs: [
-                    "Discover - Research a charity of your choice to find out how they go about fundraising. This could be a global charity or a smaller local charity.",
-                    "Experience - Spend a few hours assisting a local charity, experiencing first-hand the impact of their work and what funds support.",
-                    "Mobilise - Organise, plan, budget and execute a fundraising initiative such as a coffee morning, trivia night or sponsored event.",
-                    "Solve - Consider the issues faced by Charities. Would a global charity have the same problems and dilemmas as a local one?",
-                    "Create - Make and sell simple handmade items like bracelets, cards, or baked goods, with proceeds going to charity."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "global-issues": {
-                name: "Global Issues",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/bwuafjft/activitybadge_ex_global_issues_rgb.png",
-                reqs: [
-                    "Discover - Interview someone from a different country or background about a global issue that affects their community.",
-                    "Experience - Volunteer at a local organisation that supports people affected by global issues, such as poverty, displacement, or climate change.",
-                    "Mobilise - Organise a film screening or discussion event about a global issue you care about.",
-                    "Solve - Design and run a community workshop that teaches a practical skill linked to solving a global issue.",
-                    "Create - Develop a digital resource like a podcast episode, infographic, or short video about a global issue."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "hill-walker": {
-                name: "Hill Walker",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/tb0c0uj1/activitybadge_ex_hill_walker_rgb.png",
-                mandatory: [
-                    "Take part in at least two journeys in terrain 2 areas. An appropriately qualified person must accompany or supervise the journeys."
-                ],
-                options: [
-                    "Discover - Research how to prepare for a multi-day hillwalking expedition in terrain one or two.",
-                    "Experience - Take part in a hill walk in terrain one or two, contributing to navigation, pacing, and group decision-making.",
-                    "Mobilise - Join a conservation or access-focused activity during a hill or mountain day.",
-                    "Solve - Create and act out realistic emergency scenarios in a hill environment, using appropriate equipment and techniques.",
-                    "Create - Create a detailed walk plan and terrain model for a challenging hill walk, using either digital or physical materials."
-                ],
-                choose: 3
-            },
-            "hobbies": {
-                name: "Hobbies",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/jz0brzzn/activitybadge_ex_hobbies_rgb.png",
-                reqs: [
-                    "Discover - Explore how hobbies help people define who they are. Meet some people of different ages and ask them about how their hobbies have shaped their identity.",
-                    "Experience - Explore how your hobby is portrayed in media, advertising, or pop culture.",
-                    "Mobilise - Support someone who's new to your hobby by helping them get started and stay motivated.",
-                    "Solve - Set yourself a goal within your hobby that requires persistence and problem-solving.",
-                    "Create - Team up with others to create something that blends your hobbies together."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "leadership": {
-                name: "Leadership",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/sa2cpqvi/activitybadge_ex_leadership_rgb.png",
-                reqs: [
-                    "Discover - Learn about the different types of Leadership style. Take part in a quiz to find out what your leadership style is.",
-                    "Experience - Take an active role in leading a camp, event, project or session. Ask your fellow Explorers to evaluate your leadership style.",
-                    "Mobilise - Lead a charity campaign or activity. Build a team of people to support you, and plan how you will carry out the activity.",
-                    "Solve - Visit an escape room, and assign different members of the team different leadership roles for different parts of the activity.",
-                    "Create - Design a leadership workshop on how to be an effective leader."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "life-skills": {
-                name: "Life Skills",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/d43eojis/activitybadge_ex_life-skills_rgb.png",
-                reqs: [
-                    "Discover - Find out how to properly wash, dry, and care for different types of clothing, including reading care labels and choosing the right settings.",
-                    "Experience - Carry out simple home maintenance by assembling flat‑pack furniture or equipment, following written or visual instructions.",
-                    "Mobilise - Take part in a group discussion or debate and practise active listening and clear speaking.",
-                    "Solve - Plan how to get somewhere using only public transport. What are your different options, how much will it cost and how long will the journey take?",
-                    "Create - Design a personal budget for a month, including income, savings, and essential expenses."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "money-skills": {
-                name: "Money Skills",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/yhfomxvy/activitybadge_ex_money-skills_rgb.png",
-                reqs: [
-                    "Discover - Understand how money works and what affects the way we use it. Find out what shapes your spending habits.",
-                    "Experience - Build your money skills by trying activities such as trading, budgeting and finding ways to grow your money.",
-                    "Mobilise - Take action and find out how to help people with money. You could organise a fundraiser or start a local project.",
-                    "Solve - Take on a challenge that'll improve your money skills and help you plan for the future.",
-                    "Create - Get creative and make something that helps others learn about money in a fun way."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "nature": {
-                name: "Nature",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/j1ljfk24/activitybadge_ex_naturalist_rgb.png",
-                reqs: [
-                    "Discover - Choose an area of the natural world, explore the conservation and environmental impact of that area.",
-                    "Experience - Observe the natural world around you. This could be a nature walk identifying plants along your journey.",
-                    "Mobilise - Take a look at how human activity is affecting the natural world. Lead a local activity to support conserving the environment.",
-                    "Solve - Come up with an idea to mitigate human impact on the environment and enable humans and nature to coexist more effectively.",
-                    "Create - Design and assemble multiple wildlife structures that work together to improve the biodiversity of a chosen outdoor space."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "performing-arts": {
-                name: "Performing Arts",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/ny0jvuwu/activitybadge_ex_performing_arts_rgb.png",
-                reqs: [
-                    "Discover - Research the job roles that exist in the theatre. Spend some time finding out the details involved in working in one of these roles.",
-                    "Experience - Get a feeling for the excitement of performance by learning and playing a selection of improvisation games and acting techniques.",
-                    "Mobilise - Plan and perform a coordinated flash mob, combining drama, dance, or music to surprise and engage.",
-                    "Solve - Research, design and create a prop/props for a performance of a well-known play using only limited materials.",
-                    "Create - Write, rehearse, create props for and perform a short play with your Unit."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "personal-safety": {
-                name: "Personal Safety",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/1qrndx5g/activitybadge_ex_personal_safety_rgb.png",
-                reqs: [
-                    "Discover - Compare how teenagers and adults think about risk and safety in everyday situations.",
-                    "Experience - Show how to manage risk for an activity or event that young people take part in.",
-                    "Mobilise - Meet or shadow frontline workers like youth workers, paramedics, police officers, or rail staff to learn about real safety issues.",
-                    "Solve - Learn and practise decision-making tools like exit plans, refusal skills, and knowing when to ask for help.",
-                    "Create - Design a toolkit to help other young people manage risk and stay safe in real-life and online situations."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "pioneering": {
-                name: "Pioneering",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/fgod0fsz/activitybadge_ex_pioneering_rgb.png",
-                mandatory: [
-                    "Take part in at least one large scale Pioneering project. You should complete your project over the course of a day."
-                ],
-                options: [
-                    "Discover - Investigate how pioneering projects or inventions have become essential to modern architecture.",
-                    "Experience - Take part in a pioneering project. This could be a large structure made within a team, or a smaller structure made solo.",
-                    "Mobilise - Research a pioneered structure and lead a team to plan and complete its construction.",
-                    "Solve - Use rubber bands and lolly sticks to create a bridge or a similar project. How much weight can it hold? How could you make it stronger?",
-                    "Create - Design a useful pioneered structure and build it in real life. Include drawings, a scale model, and a guide on how to create it."
-                ],
-                choose: 3
-            },
-            "problem-solver": {
-                name: "Problem Solver",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/xvbikg54/activitybadge_ex_problem-solver_rgb.png",
-                reqs: [
-                    "Discover - Identify a real issue affecting your local area, such as housing, transport, youth services, or environmental concerns.",
-                    "Experience - Take part in a complex team-based challenge that requires communication, logic, and creative thinking.",
-                    "Mobilise - Choose a global issue and take meaningful local action to address it.",
-                    "Solve - Participate in a structured problem-solving activity such as a mock trial, ethical debate, or engineering design challenge.",
-                    "Create - Invent a problem-solving activity for others to complete - this could be a logic puzzle, roleplay scenario, or digital challenge."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "stem": {
-                name: "S.T.E.M",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/mvldi5zd/activitybadge_ex_stem_with_rr_logo_rgb.png",
-                reqs: [
-                    "Discover - Investigate how gas turbines power everyday life. Choose a real-world example and explain how gas turbines are used.",
-                    "Experience - Take a closer look at an engine and learn how to care for it.",
-                    "Mobilise - Visit or start a community project that repairs or upcycles broken items.",
-                    "Solve - Work out how much energy a campsite would need for one night and plan how to supply it.",
-                    "Create - Build a camp gadget that is powered by renewable energy."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "space": {
-                name: "Space",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/x1cprc4f/activitybadge_ex_space_rgb.png",
-                reqs: [
-                    "Discover - Explore first-hand accounts from people who have been involved in the space industry or witnessed its impact.",
-                    "Experience - Grow a plant without using soil. Find out how things are grown in space and why we might need to.",
-                    "Mobilise - Find out about light pollution and how this can affect our exploration of space.",
-                    "Solve - Find out about satellites and space rovers, you could practice controlling something from a distance and learn why this is useful.",
-                    "Create - Using a medium of your choice showcase something about space that interests you."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "sports-and-fitness": {
-                name: "Sports and Fitness",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/zythaa3e/activitybadge_ex_physical_recreation_rgb.png",
-                reqs: [
-                    "Discover - Choose three sports that interest you and research them. What training regimes do they have? What's different about them, and what's similar?",
-                    "Experience - Take part in a new sport. Try some of the techniques and exercises from the sport.",
-                    "Mobilise - Teach a sport of your choice to a group. Think about how you can communicate the benefits of the sport.",
-                    "Solve - Choose a sport that interests you and find out if the equipment can be made either more environmentally friendly, or more accessible.",
-                    "Create - Come up with a new sport, design what it looks like, how you play, and teach another group/section it."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "survival-skills": {
-                name: "Survival Skills",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4gdg4wsh/activitybadge_ex_survival-skills_rgb.png",
-                reqs: [
-                    "Discover - Research and demonstrate different methods of building and lighting fires in outdoor environments, including their advantages and risks.",
-                    "Experience - Take part in a survival camp or outdoor challenge where you build your own shelter, cook over fire, and carry essential gear.",
-                    "Mobilise - Connect with organisations that help people prepare for or respond to emergencies and find some way to support them.",
-                    "Solve - Act out a realistic survival situation, such as getting lost while hiking or being stranded after a storm.",
-                    "Create - Research and build a survival kit tailored to a particular environment or emergency."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "teamwork": {
-                name: "Teamwork",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/hsyfjy0n/activitybadge_ex_teamwork_rgb.png",
-                reqs: [
-                    "Discover - Find out about a local team which is working in your community or local Scouting area.",
-                    "Experience - Spend a day working as part of a well-established team and find out about the important roles within their team.",
-                    "Mobilise - Form a team with some people from another Unit in your local area and work to achieve a task locally.",
-                    "Solve - Run three different team building activities. After running them, discuss any challenges you had with your group.",
-                    "Create - Produce a team-led presentation or demonstration, that teaches others a skill activity or idea."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "try-new-things": {
-                name: "Try New Things",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/jmoltp0c/activitybadge_ex_try-new-things_rgb.png",
-                reqs: [
-                    "Discover - Explore why stepping outside your comfort zone matters for personal growth, innovation, and resilience.",
-                    "Experience - Pair up with someone who has a different skill or interest, and teach each other something new.",
-                    "Mobilise - Work with a younger section or different youth group to design and run an activity that encourages them to try something new.",
-                    "Solve - Design a relay or challenge where each stage requires the group to adapt to a new rule, tool, or environment.",
-                    "Create - Develop a resource, event, or story that inspires others to embrace new experiences and thrive in uncertainty."
-                ],
-                choose: 3,
-                totalOptions: 5
-            },
-            "water-activities": {
-                name: "Water Activities",
-                cat: "activity",
-                categoryLabel: "Activity Badges",
-                image: "https://prod-cms.scouts.org.uk/media/ejhhwsmm/activitybadge_ex_water-activities_rgb.png",
-                mandatory: [
-                    "Take part in at least two activities that take place on or in the water while earning this badge. The activity should be supervised by an appropriately qualified person."
-                ],
-                options: [
-                    "Discover - Find out about the history of a water activity, or an inspirational person who takes part in water activities.",
-                    "Experience - Plan a 2-3 hour journey for a chosen water activity, then carry it out with an appropriately qualified person.",
-                    "Mobilise - Learn about water quality issues. Find out about a campaign near you and take part in an activity to support the work they do.",
-                    "Solve - Think about what could happen if things go wrong. Practice some rescue techniques and find out how to keep each other safe.",
-                    "Create - Design a craft or equipment you might use in water activities. You could even build your craft and try it out on some water!"
-                ],
-                choose: 3
-            },
-
-            // =========================================================
-            // STAGED BADGES (15)
-            // =========================================================
-
-            "staged-air-activities": {
-                name: "Air Activities",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4475/raf_staged-activities_air-acitivities_stage-1-cmyk.png",
-                isStaged: true,
-                stages: {
-                    "1": ["Make a paper aircraft and test how well it flies", "Identify four different types of aircraft",
-                        "Describe any aircraft you'd like to fly in and explain why",
-                        "Talk to someone who's flown in an aircraft", "Learn about the different jobs an aircraft can do"
-                    ],
-                    "2": [
-                        "Make an aircraft out of recycled materials and try to make it fly",
-                        "Learn the different parts of an aeroplane",
-                        "Understand the four key forces that make a plane fly: lift, thrust, drag and weight",
-                        "Know the dangers of an airfield",
-                        "Complete any three of the following: find out about one kind of aircraft, go plane spotting, meet a pilot, learn about weather effects on flying, locate aviation landmarks, use the phonetic alphabet"
-                    ],
-                    "3": [
-                        "Describe how a wing generates lift and the conditions that can cause an aircraft to stall",
-                        "Name the main control surfaces of an aeroplane and how they work",
-                        "Flight time calculation test: calculate time for 60 nautical miles at 90 knots in no wind, headwind of 15 knots, and tailwind of 30 knots",
-                        "Complete any four of the following: draw an airfield diagram, find out about drones, try a flight simulator, understand weather forecasts/METAR, know the role of an airfield marshal, explore a place of aviation interest, use the phonetic alphabet"
-                    ],
-                    "4": [
-                        "Trim a paper aeroplane or model glider to glide, stall and turn",
-                        "Draw a runway and the circuit pattern that planes follow",
-                        "Learn how wind speed and direction are measured and why they're important during take-off and landing",
-                        "Complete any four of the following: try an air-based activity, find out about flight crew roles, simulate take-off and landing, explain pilot's pre-flight checklist, explore emergency radio calls (mayday/pan-pan), follow an aircraft's flight path using maps, learn why Morse code is still used"
-                    ],
-                    "5": [
-                        "Find out about different types of air traffic control services used at airfields and airports",
-                        "Explain why aircraft have flaps, slots and slats and how each works",
-                        "Design and build a model of a part of an aircraft and explain how it helps the plane fly",
-                        "Complete any four of the following: explore aviation and climate change, explore a new aviation technology, learn emergency procedures for an aircraft, find a major flight path and explain how it's chosen, take part in a new air activity, learn runway markings and ground-to-aircraft communication, learn about different types of airspace, work with a team to simulate safely completing a flight"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-community-impact": {
-                name: "Community Impact",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4456/staged-community.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Identify need: Investigate what issues and challenges exist in your chosen community",
-                        "Plan action: Decide what issue your section should take action on",
-                        "Take action over three months: spend at least 4 hours personally taking action and involve others",
-                        "Learn and make more change: Discuss what you've learned and how you've made people's lives better",
-                        "Tell the world: Help others understand why the issue is important and what you did"
-                    ],
-                    "2": [
-                        "Identify need: Investigate what issues and challenges exist in your chosen community",
-                        "Plan action: Work with a group of non-Scouts passionate about your cause to plan action",
-                        "Take action over six months: spend at least 12 hours personally taking action and involve others",
-                        "Learn and make more change: Discuss what you've learned and how you've made people's lives better",
-                        "Tell the world: Help others understand why the issue is important and what you did"
-                    ],
-                    "3": [
-                        "Identify need: Investigate what issues and challenges exist in your chosen community",
-                        "Plan action: Work with a group of non-Scouts passionate about your cause to plan action",
-                        "Take action over nine months: spend at least 24 hours personally taking action and involve non-Scouts",
-                        "Learn and make more change: Discuss what you've learned and how you've made people's lives better",
-                        "Tell the world: Help others understand why the issue is important and what you did"
-                    ],
-                    "4": [
-                        "Identify need: Investigate what issues and challenges exist in your chosen community",
-                        "Plan action: Work with a group of non-Scouts passionate about your cause to plan action",
-                        "Take action over twelve months: spend at least 48 hours personally taking action and involve non-Scouts",
-                        "Learn and make more change: Discuss what you've learned and how you've made people's lives better",
-                        "Tell the world: Help others understand why the issue is important and what you did"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4"]
-            },
-            "staged-digital-citizen": {
-                name: "Digital Citizen",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4457/staged-digital-citizen.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Map out your regular digital actions and discuss the information you leave behind",
-                        "Learn how to create a secure password and make one of your own",
-                        "Share three ways young people can respond positively when someone's being unkind or dishonest",
-                        "Use an online service to learn a new skill and show others what you've learnt"
-                    ],
-                    "2": [
-                        "Create a list of rights that you think you should have as a young person when online",
-                        "For a week, keep track of how much time you spend online and what you're doing",
-                        "Show that you can spot the difference between facts and opinions posted online",
-                        "Investigate how people from different backgrounds interact online",
-                        "In a team, learn about a topic you care about and share with others what you've learnt using online and offline tools"
-                    ],
-                    "3": [
-                        "Map out what digital actions other people take which makes information about you public",
-                        "Create something that helps other young people to know what they should do if they're made to feel uncomfortable online",
-                        "Investigate if the people you interact with most online are similar to you or different to you",
-                        "Use several online services to research a personal opportunity that excites you",
-                        "In a team, use a digital collaboration tool to achieve something that benefits your Scout Group, a local charity, or promotes young people's voices"
-                    ],
-                    "4": [
-                        "Show that you understand your rights regarding online information (choose option A or B)",
-                        "Take part in a debate on a topic you think there may be lots of misinformation about online",
-                        "Create a digital version of the Scout Law which shows how each law can be followed when online",
-                        "Complete an online training course of your choice and share some of what you learned",
-                        "In a team with young people from other parts of the country or world, use a digital collaboration tool to achieve something that benefits Scouts, a charity, or promotes young people's voices"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4"]
-            },
-            "staged-digital-maker": {
-                name: "Digital Maker",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/6450/raspberry_pi_1-01.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Show that you know what a computer is and understand that there are lots of uses for digital technology",
-                        "Create a graphic for a computer game, app, or website",
-                        "Write clear instructions for a computer or person to follow to complete a task"
-                    ],
-                    "2": [
-                        "Create a piece of interactive or animated digital art using software",
-                        "Create a simple computer program to help with a scouting activity, and try it out",
-                        "Make a simple digital creation that uses code to interact with the wider world through inputs and outputs"
-                    ],
-                    "3": [
-                        "In a coding language of your choice, create a basic program to meet a need of Scouting or your section",
-                        "Use a programmable device with electronic components, code, and appropriate materials to create an electronic gadget and use it in a Scouting activity",
-                        "Design and create digital graphics for use as part of one of the above",
-                        "Show and present your digital making project, explaining the challenges you encountered and how you addressed them"
-                    ],
-                    "4": [
-                        "Using a combination of programming, digital art, digital devices, electronic components, and other materials, create something that could serve a purpose in a Scouting activity",
-                        "Attend a digital making event and show your work, or help somebody else in your section or another section to work towards a Digital Maker Staged Activity badge"
-                    ],
-                    "5": [
-                        "Identify a real-life local or global problem and design, build, test, and improve a solution by combining your digital making skills",
-                        "Create and share a resource that would allow someone else to replicate your project with minimal previous knowledge"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-emergency-aid": {
-                name: "Emergency Aid",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4459/staged-emergency-aid.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Explain the importance of getting help",
-                        "Explain what to say when you call 999",
-                        "Explain how to help someone who is unconscious",
-                        "Explain how to help someone who is bleeding",
-                        "Explain how to reassure someone at the scene of an emergency"
-                    ],
-                    "2": [
-                        "Explain the importance of getting help",
-                        "Explain what to say when you call 999",
-                        "Explain how to reassure someone at the scene of an emergency",
-                        "Explain how to help someone who is unconscious",
-                        "Explain how to help someone who is bleeding",
-                        "Explain how to help someone who has a burn",
-                        "Explain how to help someone who is having an asthma attack"
-                    ],
-                    "3": [
-                        "Take part in around two to three hours of training",
-                        "Explain how to call 999",
-                        "Explain how to help someone who is unconscious",
-                        "Explain how to help someone who is unconscious and not breathing",
-                        "Explain how to help someone who is bleeding",
-                        "Explain how to help someone who has heat exhaustion",
-                        "Explain how to help someone who has hypothermia",
-                        "Explain how to help someone who is choking",
-                        "Explain how to help someone who has a burn",
-                        "Explain how to help someone who is having an asthma attack"
-                    ],
-                    "4": [
-                        "Take part in around three to six hours of training from a recognised first aid provider",
-                        "Explain how to call 999",
-                        "Explain how to help someone who is unconscious",
-                        "Explain how to help someone who is unconscious and not breathing",
-                        "Explain how to help someone who is bleeding",
-                        "Explain how to help someone who has a burn",
-                        "Explain how to help someone who has heat exhaustion",
-                        "Explain how to help someone who has hypothermia",
-                        "Explain how to help someone who is choking",
-                        "Explain how to help someone who is having an asthma attack",
-                        "Explain how to help someone who is having a heart attack",
-                        "Explain how to help someone who has a head injury",
-                        "Explain how to help someone who has a suspected spinal injury",
-                        "Explain how to help someone who has a broken bone",
-                        "Explain how to help someone who has a sprain or strain",
-                        "Explain how to help someone who has meningitis"
-                    ],
-                    "5": [
-                        "Take part in around six to eight hours of training from a recognised first aid provider",
-                        "Explain how to call 999",
-                        "Explain how to help someone who is unconscious",
-                        "Explain how to help someone who is unconscious and not breathing",
-                        "Explain how to help someone who is bleeding",
-                        "Explain how to help someone who has a burn",
-                        "Explain how to help someone who has heat exhaustion",
-                        "Explain how to help someone who has hypothermia",
-                        "Explain how to help someone who is choking",
-                        "Explain how to help someone who is having an asthma attack",
-                        "Explain how to help someone who is having a heart attack",
-                        "Explain how to help someone who has a head injury",
-                        "Explain how to help someone who has a suspected spinal injury",
-                        "Explain how to help someone who has a broken bone",
-                        "Explain how to help someone who has a sprain or strain",
-                        "Explain how to help someone who has meningitis",
-                        "Explain how to help someone who is having a stroke",
-                        "Explain how to help someone who is experiencing a diabetic emergency",
-                        "Explain how to help someone who is having a severe allergic reaction",
-                        "Explain how to help someone who is having a seizure"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-hikes-away": {
-                name: "Hikes Away",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/19907/hikes-away-02-01-1.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "2": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "5": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "10": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "15": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "20": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "35": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "50": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "75": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ],
-                    "100": [
-                        "Complete a hike or journey involving at least 5 hours of activity with a purpose agreed with your leader",
-                        "Activities can include: hill walking, mountain biking, canoe touring, pony trekking, ski touring, or backpacking"
-                    ]
-                },
-                stageList: ["1", "2", "5", "10", "15", "20", "35", "50", "75", "100"]
-            },
-            "staged-musician": {
-                name: "Musician",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4461/staged-musician.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Listen to a short tune and sing it back",
-                        "Listen to another tune and beat or clap out the rhythm",
-                        "Sing or play two different types of song or tune in front of other people",
-                        "Demonstrate some of the musical exercises that you use to practice your skills",
-                        "Talk about your instrument and why you enjoy playing it (or the songs you sing and why you enjoy singing them)",
-                        "Tell your assessor about the music that you most like to listen to"
-                    ],
-                    "2": [
-                        "Reach Grade One standard for the Associated Board of the Royal School of Music (or similar)",
-                        "Sing or play two different types of song or tune in front of other people",
-                        "Demonstrate some of the musical exercises that you use to practice your skills",
-                        "Talk about your instrument and why you enjoy playing it (or the songs you sing and why you enjoy singing them)",
-                        "Name a piece of music associated with your instrument",
-                        "Name several musicians who you have heard",
-                        "Talk about your own interests in music"
-                    ],
-                    "3": [
-                        "Reach Grade Two standard for the Associated Board of the Royal School of Music (or similar)",
-                        "Sing or play two different types of song or tune in front of other people",
-                        "Demonstrate some of the musical exercises that you use to practice your skills",
-                        "Talk about your instrument and why you enjoy playing it (or the songs you sing and why you enjoy singing them)",
-                        "Talk about three well known pieces of music or songs associated with your instrument",
-                        "Talk about your own interests in music"
-                    ],
-                    "4": [
-                        "Reach Grade Three standard for the Associated Board of the Royal School of Music (or similar)",
-                        "Sing or play three different types of song or tune (one solo and one with other musicians)",
-                        "Demonstrate some of the musical exercises that you use to practice your skills",
-                        "Talk about your instrument and why you enjoy playing it (or the songs you sing and why you enjoy singing them)",
-                        "Talk about some of the musicians who are associated with your instrument",
-                        "Talk about your own interests in music"
-                    ],
-                    "5": [
-                        "Reach Grade Five standard for the Associated Board of the Royal School of Music (or similar)",
-                        "Sing or play three different types of song or tune (one solo and one with other musicians)",
-                        "Demonstrate some of the musical exercises that you use to practice your skills",
-                        "Talk about your instrument and why you enjoy playing it (or the songs you sing and why you enjoy singing them)",
-                        "Name several well known pieces of music associated with your instrument",
-                        "Name several musicians associated with your instrument",
-                        "Talk about your own interests in music"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-nautical-skills": {
-                name: "Nautical Skills",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4462/staged-nautical.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Take part in a water activity taster session",
-                        "Correctly identify the different equipment used for the activity you chose",
-                        "Gain an understanding of the safety equipment used"
-                    ],
-                    "2": [
-                        "Take part in a water activity taster session for at least one hour",
-                        "Show that you understand what to do in the event of a capsize or man overboard situation",
-                        "Demonstrate that you can tie either a figure of eight or a reef knot and describe how you use them",
-                        "Name the basic equipment you used during your chosen activity",
-                        "List some clothing that is not suitable for your chosen activity and explain why",
-                        "Show that you know the safety equipment you used and why it's needed"
-                    ],
-                    "3": [
-                        "Take part in at least two one-hour taster sessions in two different water based activities",
-                        "Show that you know how to act safely in your chosen activity if you are involved in a capsize or man overboard situation",
-                        "Show how to check water depth using a method appropriate to your activity",
-                        "Show how to tie a clove hitch, a bowline knot, and a round turn and two half-hitches and explain when these would be used",
-                        "Name the parts of one type of watercraft",
-                        "Demonstrate and explain what clothing is suitable for your chosen activity",
-                        "Explain the basic safety rules that apply to your chosen activity",
-                        "Explain the difference between a buoyancy aid and a life jacket, when each should be used and how they function"
-                    ],
-                    "4": [
-                        "Develop your skills in two water based activities showing competency in launch and recovery, manoeuvring, communication and safety",
-                        "Take part in a capsize and recovery drill for the two watercraft you have chosen",
-                        "Use a throw bag or line to reach a person six metres away in the water",
-                        "Show you know how to apply the steering rules to your chosen watercraft and recognise the main channel markers",
-                        "Use a knot or a cleat correctly to moor a boat with a painter or mooring line",
-                        "Complete one of three options: pipe the 'still' and 'carry on' on a Bosun's call, make a sailmaker's whipping, or make an eye splice or a back splice",
-                        "Name the parts of your chosen watercraft (different from Stage 3)",
-                        "Take part in a challenging three-hour expedition or exercise afloat",
-                        "Take part in a competition or crew-based activity in your chosen watercraft"
-                    ],
-                    "5": [
-                        "Develop your skills in one water based activity to a level where you can operate the watercraft safely",
-                        "Show how you would use your watercraft to recover others from the water",
-                        "Demonstrate knowledge of pilotage, navigation lights, sound signals, tides, currents and eddies",
-                        "Demonstrate that you can tie a figure-of-eight knot, clove hitch, round turn and two half-hitches, sheet bend, rolling hitch and bowline",
-                        "Explain the different types of ropes used in water activities, their advantages and disadvantages and how to care for them",
-                        "Complete one of three options: make a rope fender, demonstrate three calls on a Bosun's pipe, or hoist the colours for a Sea Scout ceremony",
-                        "Plan and take part in a one-day expedition or exercise afloat with others",
-                        "Learn how different boats communicate with each other in your location",
-                        "Take on the helm or cox role in a watercraft or help prepare a team for a competition",
-                        "Learn how to get local weather forecasts and recognise signs of changing weather",
-                        "Learn how to safeguard against the effects of cold, and how to recognise and treat hypothermia"
-                    ],
-                    "6": [
-                        "Develop your skills in one water based activity to a level where you can operate the watercraft safely (different from Stage 5)",
-                        "Learn about flares, distress signals and marine VHF radio, and when it is appropriate to use them",
-                        "Learn about and explain the access and mooring issues in your chosen activity",
-                        "Learn about and explain the 'nautical rules of the road' including IRPCS, light signals, sound signals and the use of channels",
-                        "Show an understanding of the maintenance your watercraft needs and show you can carry out simple repairs over three months",
-                        "Plan and take part in an overnight expedition by water with others (at least six hours underway)"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5", "6"]
-            },
-            "staged-navigator": {
-                name: "Navigator",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4463/staged-navigator.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Locate yourself on a simple map",
-                        "Identify a number of features or locations on that map",
-                        "Learn the four cardinal points of a compass",
-                        "Draw a simple map of where you live, your meeting place or another area local to you",
-                        "Use a map during an outdoor activity",
-                        "Show you understand how to dress appropriately and what equipment you and the adults will need"
-                    ],
-                    "2": [
-                        "Learn how to read a four-figure grid reference",
-                        "Understand how to use the key of a map",
-                        "Use a map during an outdoor activity",
-                        "Draw a simple map to direct someone from your meeting place to a local point of interest",
-                        "With other Scouts, go for a walk and take turns to use navigation methods (written instructions, recorded instructions, road signs, tracking signs, maps)",
-                        "Learn the eight points of a compass and use them in an activity",
-                        "Show you know how to dress appropriately and what equipment you and the adults need"
-                    ],
-                    "3": [
-                        "Learn how to read a six figure grid reference",
-                        "Understand contour lines on an Ordnance Survey map",
-                        "Using 1:50000 and 1:25000 scale Ordnance Survey maps show that you understand the meaning of scale, can set the map to north and recognise conventional map symbols",
-                        "Follow and walk a route of at least 5km, using a map to navigate for at least part of the journey",
-                        "Show you know how to dress appropriately and what kit you and your group will need"
-                    ],
-                    "4": [
-                        "Convert grid bearings to magnetic bearings and vice versa",
-                        "Use back bearings to check the route",
-                        "Estimate your current position using a compass",
-                        "Walk on a bearing including 'deviating from course' (boxing)",
-                        "Read a six figure grid reference",
-                        "Interpret contour lines in terms of shape and steepness of terrain including valley, ridge, spur and col",
-                        "Show how to set a map, with and without a compass",
-                        "Learn how to use and give six-figure grid references and demonstrate the use of a roamer",
-                        "Walk two compass routes of at least 5 kilometres each (one defined by you, one by an adult)",
-                        "Show you know how to dress appropriately and what kit you and your group need",
-                        "Choose the most appropriate type of map for the journey you are taking"
-                    ],
-                    "5": [
-                        "Using a 1:25000 scale OS map and compass, navigate along a course of at least six 'legs' to the standard of the Hill and Moorland Leader award",
-                        "Using only a compass and pacing, successfully navigate a course of at least four 'legs'",
-                        "Using only a map, successfully navigate a course of at least four 'legs'",
-                        "Make two sketch maps (one urban, one rural) that would enable a stranger to travel successfully between two points",
-                        "Complete at least three different orienteering courses in a reasonable time",
-                        "Complete a comprehensive route plan for a 20km hill walking route set by an appropriate adult in Terrain One or Terrain Two",
-                        "Show you know what the most appropriate clothing and equipment is for your journey"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-nights-away": {
-                name: "Nights Away",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/19908/nights-away-02-01-1.png",
-                isStaged: true,
-                stages: {
-                    "1": ["Spend 1 night away on a Scout activity"],
-                    "2": ["Spend 2 nights away on a Scout activity"],
-                    "3": ["Spend 3 nights away on a Scout activity"],
-                    "4": ["Spend 4 nights away on a Scout activity"],
-                    "5": ["Spend 5 nights away on a Scout activity"]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-paddle-sports": {
-                name: "Paddle Sports",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4465/staged-paddle-sports.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Identify different types of paddle craft",
-                        "Name three places you could safely go canoeing or kayaking",
-                        "Take part in a warm-up activity to prepare you for canoeing or kayaking",
-                        "Dress appropriately for your chosen activity and show you know the importance of buoyancy aids",
-                        "Take part in a taster session that covers: naming equipment, getting in and out of a boat safely, balancing a boat, manoeuvring your boat in different directions"
-                    ],
-                    "2": [
-                        "Lift, carry and launch a boat",
-                        "Paddle forward in a straight line",
-                        "Show you can steer around a course",
-                        "Show you can stop the boat safely",
-                        "Show you can exit the boat onto the shore safely",
-                        "Capsize, swim to the shore and empty the boat of water"
-                    ],
-                    "3": [
-                        "Using a different vessel to Stage 2, show more than one safe method for lifting and carrying your vessel",
-                        "Demonstrate two different ways of safely launching your vessel",
-                        "Show you can get in and out/on or off of your vessel without help",
-                        "Show you can steer around a figure of eight course",
-                        "Paddle forwards and backwards in a straight line, keeping good posture",
-                        "Show you can stop the vessel safely when it's moving back and forth",
-                        "Capsize, swim to the shore and empty the boat of water if necessary",
-                        "Assist someone else back into their vessel following a capsize"
-                    ],
-                    "4": [
-                        "Choose two disciplines (Crew, Flat water, White water, Touring, Short boat, Ergo) and paddle your vessel for at least 200m in each",
-                        "Take part in at least two of the following activities that you have not tried before: Freestyle, Marathon, Polo, Slalom, Sprint, Surf, Time trial, Wild water"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4"]
-            },
-            "staged-sailing": {
-                name: "Sailing",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4466/staged-sailing.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Identify different types of sailing crafts",
-                        "Name three places you could safely go sailing",
-                        "Take part in a warm-up activity to prepare you for a sailing activity",
-                        "Dress appropriately for a sailing activity and show you know the importance of buoyancy aids",
-                        "Take part in a taster session that covers: naming equipment and parts of the boat, getting into and out of a boat safely, balancing a boat, manoeuvring your boat in different directions"
-                    ],
-                    "2": [
-                        "Launch and recover your dinghy",
-                        "Control the direction and speed of your dinghy to steer around a course",
-                        "Stop your dinghy safely",
-                        "Capsize and get to the shore safely, and recover the dinghy",
-                        "Show you can moor your dinghy"
-                    ],
-                    "3": [
-                        "Prepare, launch and recover your boat in an onshore wind",
-                        "Show the correct way to store your boat ashore",
-                        "Show you can right a capsized dinghy as helm or crew",
-                        "Show you know how to recover a man overboard",
-                        "Demonstrate ability in sail setting, balance, trim, course made good, centreboard, taking upwind, gybing, coming alongside and picking up a mooring",
-                        "Learn how a sail works and its basic aerodynamics",
-                        "When sailing, show you can understand and use basic terminology such as windward, leeward, and bear away"
-                    ],
-                    "4": [
-                        "Launch and recover your boat in any wind direction",
-                        "Set up your boat according to weather conditions, using sail and rig controls",
-                        "Show that you're able to recover a man overboard",
-                        "Show that you know about: International Regulations for Preventing Collision at Sea (IRPCS), Beaufort Scale, Synoptic charts, Tidal ebb and flow, Spring and neap tides"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4"]
-            },
-            "staged-snowsports": {
-                name: "Snowsports",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4467/staged-snowsports.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Identify different types of snowsports",
-                        "Name three places you could safely take part in snowsport activities",
-                        "Take part in a warm-up activity to prepare you for a snowsport activity",
-                        "Dress properly for your chosen activity and show you know the importance of helmets",
-                        "Take part in a taster session covering: naming equipment, getting in and out of skis/snowboard, balancing, moving in a straight line, controlling speed, stopping"
-                    ],
-                    "2": [
-                        "Identify the equipment you require and know how to carry it safely",
-                        "Climb and then ski or snowboard down a short run, or go on a short cross country ski",
-                        "Show you can make wide and narrow turns",
-                        "Show you can stop and wait safely on a run avoiding other users, or stop safely if doing cross country skiing",
-                        "Know how to safely fall and get back up onto your feet",
-                        "Choose one: demonstrate how to safely use a drag lift or magic carpet, OR demonstrate your ability to identify a suitable cross country skiing route"
-                    ],
-                    "3": [
-                        "Choose one option: Complete badge requirements (identify mountain hazards, know what to do in an accident, know the 'Ski Way Code', understand extreme temperature effects, choose two of four activities) OR gain a Personal Activity Permit for Snowsports"
-                    ],
-                    "4": [
-                        "Show you understand what equipment to carry for different types of activity (single lesson, day on hill, expedition, off-piste, snow park)",
-                        "Show how to look after yourself and others in the event of not being able to return down the mountain",
-                        "Show your ability to use a ski map or resort map and identify where you are on the map",
-                        "Plan a half-day's activity considering location, group size and ability, equipment, and a plan B",
-                        "Participate in a snowsport activity different from that which the other requirements have been completed in",
-                        "Choose and complete two of: demonstrate ability to descend a black run, perform turns in fresh snow, complete a day's cross country ski trip, complete a cross-country timed route and improve your time"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4"]
-            },
-            "staged-swimmer": {
-                name: "Swimmer",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/4468/staged-swimmer.png",
-                isStaged: true,
-                stages: {
-                    "1": [
-                        "Learn how you can stay safe while being in or around water",
-                        "Discover ways to stretch your body as part of your warm up before getting in",
-                        "Learn how to get safely in and out of the water, with support if needed",
-                        "Take part in an activity to help you build your confidence in getting your hair wet",
-                        "Push away from the wall on either your front or back, then glide further into the middle of the pool",
-                        "Float on your back or front, with or without support",
-                        "Swim at least 5 metres with or without support from a float",
-                        "Play a game in the water with your friends and practice the skills you've learned"
-                    ],
-                    "2": [
-                        "Learn about where to swim safely in different locations and find out some safety rules for a swimming pool",
-                        "Take part in a warm up before getting in the pool",
-                        "Demonstrate how to get in and out of the water safely without support",
-                        "Swim 10 metres on your front, with or without support",
-                        "Swim 10 metres on your back, with or without support",
-                        "Perform a log roll of at least 180 degrees in the water, either on your front or on your back",
-                        "Demonstrate a push and glide into the middle of the pool on both your front and your back",
-                        "Starting from the side of the pool, retrieve a floating object with your face submerged in the water",
-                        "Float on your front and then your back, holding each float for at least 5 seconds"
-                    ],
-                    "3": [
-                        "Learn about where to swim safely in different locations and find out about the four key water safety messages",
-                        "Take part in a warm up before getting in the pool",
-                        "Demonstrate how to get in and out of the water safely without support",
-                        "Tread water for 15 seconds",
-                        "Swim 15 metres on your front without support",
-                        "Swim 15 metres on your back without support",
-                        "Swim 25 metres in a stroke of your choice, with or without support",
-                        "Show a push and glide movement into a swim, then swim for 5 metres",
-                        "From a floating position, move into a standing position without support on both your front and back",
-                        "Pick up an object from the floor of the pool"
-                    ],
-                    "4": [
-                        "Learn about where to swim safely in different locations and find out about rescue equipment",
-                        "Take part in a warm up before getting in the pool",
-                        "Demonstrate how to get in and out of the water safely using two different methods of entry",
-                        "Swim confidently on your front for 25 metres without stopping",
-                        "Swim confidently on your back for 25 metres without stopping",
-                        "Swim 25 metres using either the breaststroke or butterfly swimming techniques",
-                        "Demonstrate the breaststroke leg movements whilst holding onto the side of the pool",
-                        "Swim 100 metres in a stroke of your choice",
-                        "Tread water for 30 seconds",
-                        "Swim in clothes for 10 metres",
-                        "Scull for 5 metres on your front or your back"
-                    ],
-                    "5": [
-                        "Learn about where to swim safely in different locations and find out about rescue equipment",
-                        "Take part in a warm up before getting in the pool",
-                        "Demonstrate how to get in and out of the water safely using a variety of different methods of entry",
-                        "Swim confidently on your front for 50 metres without stopping",
-                        "Swim confidently on your back for 50 metres without stopping",
-                        "Swim breaststroke or butterfly for 50 metres",
-                        "Swim 200 metres in a stroke of your choice",
-                        "Swim in clothes for 25 metres",
-                        "Perform 3 different sculling techniques during a swim",
-                        "Tread water with one hand above the water to attract attention",
-                        "Demonstrate one diving technique into the pool followed by a 25 metre swim",
-                        "Learn about different rescues and perform one of them"
-                    ]
-                },
-                stageList: ["1", "2", "3", "4", "5"]
-            },
-            "staged-time-on-water": {
-                name: "Time on Water",
-                cat: "staged",
-                categoryLabel: "Staged Badges",
-                image: "https://prod-cms.scouts.org.uk/media/ighphwhq/royal-navy-staged-badge-time-on-the-water-2018-rgb_347-x-350px.png",
-                isStaged: true,
-                stages: {
-                    "1": ["Complete 1 session on the water (2-3 hours for Explorers)"],
-                    "2": ["Complete 2 sessions on the water (2-3 hours each for Explorers)"],
-                    "5": ["Complete 5 sessions on the water (2-3 hours each for Explorers)"],
-                    "10": ["Complete 10 sessions on the water (2-3 hours each for Explorers)"],
-                    "15": ["Complete 15 sessions on the water (2-3 hours each for Explorers)"],
-                    "20": ["Complete 20 sessions on the water (2-3 hours each for Explorers)"],
-                    "35": ["Complete 35 sessions on the water (2-3 hours each for Explorers)"],
-                    "50": ["Complete 50 sessions on the water (2-3 hours each for Explorers)"],
-                    "75": ["Complete 75 sessions on the water (2-3 hours each for Explorers)"],
-                    "100": ["Complete 100 sessions on the water (2-3 hours each for Explorers)"]
-                },
-                stageList: ["1", "2", "5", "10", "15", "20", "35", "50", "75", "100"]
-            },
-
-            // =========================================================
-            // CHALLENGE AWARDS (6)
-            // =========================================================
-
-            "challenge-adventure": {
-                name: "Adventure Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/ilud2rrz/challengeaward_ex_adventure_rgb.png",
-                reqs: [
-                    "Choose an appropriate adventure challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Create, Experience, Discover, Mobilise, Solve, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-            "challenge-community": {
-                name: "Community Engagement Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/uldlnb1e/challengeaward_ex_engagement_rgb.png",
-                reqs: [
-                    "Choose an appropriate community engagement challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Create, Experience, Discover, Mobilise, Solve, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-            "challenge-employability": {
-                name: "Employability Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/ftypkfni/challengeaward_ex_employability_rgb.png",
-                reqs: [
-                    "Choose an appropriate employability challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Create, Experience, Discover, Mobilise, Solve, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-            "challenge-international": {
-                name: "International Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/hx4djakk/challengeaward_ex_international_rgb.png",
-                reqs: [
-                    "Choose an appropriate international challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Discover, Mobilise, Experience, Solve, Create, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-            "challenge-leadership": {
-                name: "Leadership Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/l0hd3p4h/challengeaward_ex_leadership_-challenge-_rgb.png",
-                reqs: [
-                    "Choose an appropriate leadership challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Create, Experience, Discover, Mobilise, Solve, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-            "challenge-values": {
-                name: "Values Challenge",
-                cat: "challenge",
-                categoryLabel: "Challenge Awards",
-                image: "https://prod-cms.scouts.org.uk/media/pionkvie/challengeaward_ex_values_rgb.png",
-                reqs: [
-                    "Choose an appropriate values challenge to achieve within 6 months",
-                    "Use the 6 Experience Principles to plan your challenge: Create, Experience, Discover, Mobilise, Solve, Reflect",
-                    "Record your progress and achievements",
-                    "Share your evidence with your Leaders or fellow Explorers"
-                ]
-            },
-
-            // =========================================================
-            // TOP AWARDS (5)
-            // =========================================================
-
-            "chiefs-platinum": {
-                name: "Chief Scout's Platinum Award",
-                cat: "top",
-                categoryLabel: "Top Awards",
-                image: "https://prod-cms.scouts.org.uk/media/3954/chief-scout-platinum-award.png",
-                reqs: [
-                    "Be a member of Explorer Scouts for at least 6 months",
-                    "Complete 8 nights away as an Explorer Scout (4 camping)",
-                    "Complete 2 activities from the ICV list (different areas)",
-                    "Choose 1 option: Hold Bronze DofE/Gateway OR Complete the 4 Platinum Scout Challenges (Skill, Physical, Service, Expedition)",
-                    "Extra 3 months on one of the Skill, Physical or Service challenges"
-                ]
-            },
-            "chiefs-diamond": {
-                name: "Chief Scout's Diamond Award",
-                cat: "top",
-                categoryLabel: "Top Awards",
-                image: "https://prod-cms.scouts.org.uk/media/3952/chief-scout-diamond-award.png",
-                reqs: [
-                    "Be a member of Explorer Scouts or Scout Network for at least 12 months",
-                    "Complete 16 nights away (8 camping)",
-                    "Complete 4 activities from the ICV list (one from each area)",
-                    "Hold Silver DofE or Silver Gateway Award",
-                    "Complete the 4 Diamond Challenges: Skill (3/6 months), Physical (3/6 months), Service (6 months), Expedition (3 days/2 nights)",
-                    "Extra 3 months on one of the Skill, Physical or Service challenges"
-                ]
-            },
-            "kings-scout": {
-                name: "King's Scout Award",
-                cat: "top",
-                categoryLabel: "Top Awards",
-                image: "https://prod-cms.scouts.org.uk/media/19818/kings-scout-award-graphic.png",
-                reqs: [
-                    "Aged 16-25, member of Explorer Scouts or Scout Network for at least 18 months",
-                    "Complete 24 nights away (12 camping)",
-                    "Complete 6 ICV activities (2 from each area)",
-                    "Make a presentation covering all elements of the award",
-                    "Choose 1 option: Hold Gold DofE/Gateway OR Complete the 4 King's Scout Challenges: Skill, Physical Activity, Service, Expedition (4 days/3 nights), Residential (5 days/4 nights)"
-                ]
-            },
-            "explorer-belt": {
-                name: "Explorer Belt",
-                cat: "top",
-                categoryLabel: "Top Awards",
-                image: "https://prod-cms.scouts.org.uk/media/3949/explorer-belt-badge.png",
-                reqs: [
-                    "Register your intention to complete the award",
-                    "Be an Explorer Scout aged 16+ or Scout Network member (or Girlguiding aged 16-25)",
-                    "Undertake a 10-day expedition outside the UK (50+ hours travelling)",
-                    "Show competence in: Navigation, Expedition cooking, Lightweight camping, Language, Fitness, Proficiency in mode of travel, Team building, First Aid",
-                    "Agree a budget and record spending",
-                    "Keep a logbook of the expedition",
-                    "Complete at least 10 minor projects and 1 major project",
-                    "Take part in a debrief",
-                    "Make a presentation to an assessment panel"
-                ]
-            },
-            "young-leader": {
-                name: "Young Leader Award",
-                cat: "top",
-                categoryLabel: "Top Awards",
-                image: "https://prod-cms.scouts.org.uk/media/3956/young-leader.png",
-                reqs: [
-                    "Attend all 11 Young Leader training modules (A-K)",
-                    "Mission One: Plan and run at least 3 games (indoor and outdoor)",
-                    "Mission Two: Plan and run an activity (not a game)",
-                    "Mission Three: Take section programme ideas to a programme planning meeting",
-                    "Mission Four: Organise and run part of the section programme"
-                ]
-            }
-        };
+        // 🔧 CHANGE THIS URL to your Gist raw URL
+        var BADGES_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/badges.json';
 
         // ============================================================
-        // ORDER — Sections in display order
+        // STATE
         // ============================================================
 
+        var BADGES = {};
         var SECTION_ORDER = [
             { key: "activity", label: "Activity Badges" },
             { key: "staged", label: "Staged Badges" },
             { key: "challenge", label: "Challenge Awards" },
             { key: "top", label: "Top Awards" }
         ];
-
-        // ============================================================
-        // STATE
-        // ============================================================
 
         var state = {
             done: {},
@@ -2064,6 +804,50 @@
             userName: "",
             scrollPosition: 0
         };
+
+        // ============================================================
+        // LOAD BADGE DATA
+        // ============================================================
+
+        function loadBadgeData() {
+            var loading = document.getElementById('loadingState');
+            var error = document.getElementById('errorState');
+            var main = document.getElementById('mainApp');
+            var refreshBtn = document.getElementById('refreshBtn');
+
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            main.style.display = 'none';
+            refreshBtn.classList.add('loading');
+
+            fetch(BADGES_URL, {
+                cache: 'no-cache',
+                headers: { 'Cache-Control': 'no-cache' }
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(function(data) {
+                BADGES = data;
+                loading.style.display = 'none';
+                main.style.display = 'block';
+                refreshBtn.classList.remove('loading');
+                load();
+                navigateTo(state.currentPage || 'home');
+                console.log('✅ Badges loaded!', Object.keys(BADGES).length + ' badges');
+            })
+            .catch(function(err) {
+                console.error('Failed to load badges:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                refreshBtn.classList.remove('loading');
+            });
+        }
+
+        // ============================================================
+        // STATE MANAGEMENT
+        // ============================================================
 
         function load() {
             try {
@@ -2143,7 +927,6 @@
                 var total = mandatoryTotal + requiredOptions;
                 var done = mandatoryDone + optionsComplete;
 
-                // Special case: if all mandatory done and at least required options done
                 var isComplete = (mandatoryDone === mandatoryTotal) && (optionsDone >= requiredOptions);
 
                 return {
@@ -2201,7 +984,6 @@
             var badge = BADGES[id];
             if (!badge) return "Not Started";
 
-            // For mandatory + choose badges
             if (badge.mandatory && badge.options) {
                 var p = getProgress(id);
                 if (p.isComplete) return "Complete";
@@ -2209,7 +991,6 @@
                 return "Not Started";
             }
 
-            // For "choose" badges (e.g., 3 of 5)
             if (badge.choose && badge.totalOptions) {
                 var done = 0;
                 for (var i = 0; i < badge.reqs.length; i++) {
@@ -2220,13 +1001,11 @@
                 return "Not Started";
             }
 
-            // For staged badges
             if (badge.isStaged && badge.stages) {
                 var p = getProgress(id);
                 return getStatusTextFromPct(p.pct);
             }
 
-            // For regular badges (all requirements needed)
             var p = getProgress(id);
             return getStatusTextFromPct(p.pct);
         }
@@ -2332,7 +1111,6 @@
 
             var html = '';
 
-            // Profile header
             html += '<div class="profile-header">';
             html += '<span class="avatar">👤</span>';
             html += '<input class="name-input" id="userNameInput" type="text" placeholder="Your Name" value="' + state
@@ -2345,7 +1123,6 @@
             html += '</div>';
             html += '</div>';
 
-            // Favourites
             html += '<div class="profile-section-title">⭐ Favourites</div>';
             if (state.favourites.length === 0) {
                 html += '<div class="profile-empty"><span class="big">⭐</span><p>No favourites yet</p></div>';
@@ -2373,7 +1150,6 @@
                 html += '</div>';
             }
 
-            // In Progress
             html += '<div class="profile-section-title">⏳ In Progress</div>';
             if (startedIds.length === 0) {
                 html += '<div class="profile-empty"><span class="big">⏳</span><p>No badges in progress</p></div>';
@@ -2401,7 +1177,6 @@
                 html += '</div>';
             }
 
-            // Completed
             html += '<div class="profile-section-title">✅ Completed</div>';
             if (completedIds.length === 0) {
                 html += '<div class="profile-empty"><span class="big">✅</span><p>No badges completed yet</p></div>';
@@ -2428,7 +1203,6 @@
 
             container.innerHTML = html;
 
-            // Bind name input events
             var nameInput = document.getElementById("userNameInput");
             if (nameInput) {
                 nameInput.addEventListener("input", function() {
@@ -2477,7 +1251,6 @@
         // ============================================================
 
         function openModal(id) {
-            // Save scroll position before opening
             state.scrollPosition = window.scrollY;
 
             var b = BADGES[id];
@@ -2509,11 +1282,9 @@
             var contentArea = document.getElementById("modalContentArea");
             var html = '';
 
-            // Check if this is a mandatory + choose badge
             if (b.mandatory && b.options) {
                 var choose = b.choose || 3;
 
-                // Mandatory section
                 html += '<div class="mandatory-label">Mandatory:</div>';
                 html += '<ul>';
                 for (var m = 0; m < b.mandatory.length; m++) {
@@ -2527,7 +1298,6 @@
                 }
                 html += '</ul>';
 
-                // Options section
                 html += '<div class="choose-hint">Choose ' + choose + ' of ' + b.options.length +
                 ' activities below:</div>';
                 html += '<ul>';
@@ -2543,7 +1313,6 @@
                 html += '</ul>';
 
                 var p = getProgress(id);
-                // Count how many mandatory are done
                 var mandatoryDone = 0;
                 for (var md = 0; md < b.mandatory.length; md++) {
                     if (state.done[id + "-mandatory-" + md]) mandatoryDone++;
@@ -2558,7 +1327,6 @@
                 document.getElementById("modalCount").textContent = progressDisplay + " complete";
 
             } else if (b.reqs) {
-                // Regular badge with requirements
                 if (b.choose && b.totalOptions) {
                     html += '<div class="choose-hint">Choose ' + b.choose + ' of ' + b.totalOptions +
                         ' activities below:</div>';
@@ -2674,11 +1442,9 @@
         }
 
         function closeModal() {
-            // Restore scroll position when closing
             document.getElementById("modalOverlay").className = "modal-overlay";
             document.body.style.overflow = "";
 
-            // Restore scroll position after a tiny delay
             setTimeout(function() {
                 if (state.scrollPosition > 0) {
                     window.scrollTo(0, state.scrollPosition);
@@ -2715,12 +1481,10 @@
             save();
             renderAll();
 
-            // Update modal count
             var b = BADGES[id];
             if (b && b.reqs) {
                 var p = getProgress(id);
                 document.getElementById("modalCount").textContent = p.done + " / " + p.total + " complete";
-                // Update checkbox styling
                 var items = document.querySelectorAll("#modalContentArea ul li");
                 if (items[index]) {
                     var cb = items[index].querySelector('input[type="checkbox"]');
@@ -2765,12 +1529,10 @@
             var progressDisplay = mandatoryDone + Math.min(optionsDone, required) + '/' + (b.mandatory.length + required);
             document.getElementById("modalCount").textContent = progressDisplay + " complete";
 
-            // Update checkbox styling
             var items = document.querySelectorAll("#modalContentArea ul li");
             for (var i = 0; i < items.length; i++) {
                 var cb = items[i].querySelector('input[type="checkbox"]');
                 var text = items[i].querySelector(".text");
-                // Find which key this li corresponds to
                 var key = id + "-" + (i < b.mandatory.length ? "mandatory-" + i : "option-" + (i - b.mandatory.length));
                 if (cb) cb.checked = !!state.done[key];
                 if (text) {
@@ -2828,7 +1590,6 @@
                 for (var o = 0; o < b.options.length; o++) {
                     delete state.done[id + "-option-" + o];
                 }
-                // Re-render the modal
                 openModal(id);
             } else {
                 for (var i = 0; i < b.reqs.length; i++) {
@@ -2870,11 +1631,14 @@
 
         document.querySelectorAll('.nav-item').forEach(function(item) {
             item.onclick = function() {
-                // Save scroll position before navigating
                 state.scrollPosition = window.scrollY;
                 navigateTo(this.dataset.page);
             };
         });
+
+        document.getElementById('refreshBtn').onclick = function() {
+            loadBadgeData();
+        };
 
         window.addEventListener('popstate', function(e) {
             if (goBack()) {
@@ -2897,11 +1661,11 @@
         // BOOT
         // ============================================================
 
-        load();
-        navigateTo('home');
+        // Load badge data from Gist
+        loadBadgeData();
+
         console.log("🏕️ Explorer Badge Tracker loaded!");
-        console.log("📊 " + Object.keys(BADGES).length + " badges loaded.");
-        console.log("⭐ " + state.favourites.length + " favourites");
+        console.log("📊 Data source:", BADGES_URL);
     </script>
 </body>
 </html>
